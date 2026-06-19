@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>novi.bio — Bio Link Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07070b;
+    --bg2: #0e0e16;
+    --surface: rgba(255,255,255,0.04);
+    --surface-2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.09);
+    --border-hover: rgba(255,255,255,0.18);
+    --text: #f5f5fa;
+    --text-dim: #9090a8;
+    --text-mute: #5a5a70;
+    --accent: #8b5cf6;
+    --accent2: #ec4899;
+    --accent3: #06b6d4;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Animated background blobs */
+  .bg-effects { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.35; animation: float 22s ease-in-out infinite; }
+  .blob-1 { width: 500px; height: 500px; background: var(--accent); top: -120px; left: -120px; }
+  .blob-2 { width: 420px; height: 420px; background: var(--accent2); bottom: -120px; right: -100px; animation-delay: -7s; }
+  .blob-3 { width: 320px; height: 320px; background: var(--accent3); top: 40%; left: 50%; animation-delay: -14s; }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(60px,-60px) scale(1.1); }
+    66% { transform: translate(-40px,40px) scale(0.95); }
+  }
+
+  /* Nav */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(7,7,11,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .nav-logo {
+    font-weight: 800; font-size: 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    cursor: pointer; user-select: none;
+  }
+  .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .nav-links a, .nav-links button {
+    padding: 8px 14px; border-radius: 9px;
+    color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 500;
+    background: transparent; border: 1px solid transparent; cursor: pointer;
+    font-family: inherit; transition: all .2s;
+  }
+  .nav-links a:hover, .nav-links button:hover { color: var(--text); background: var(--surface); border-color: var(--border); }
+  .nav-links a.active { color: var(--text); background: var(--surface-2); border-color: var(--border); }
+  #logout-btn { color: var(--danger); }
+  #logout-btn:hover { background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3); }
+
+  /* Views */
+  .view { min-height: calc(100vh - 56px); padding: 32px 24px; animation: fadeIn .4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  .hidden { display: none !important; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  /* Auth */
+  #view-auth { display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card {
+    width: 100%; max-width: 440px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px 32px;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  .brand { text-align: center; margin-bottom: 6px; }
+  .brand h1 {
+    font-size: 36px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    letter-spacing: -0.02em;
+  }
+  .subtitle { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
+  .tabs { display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+  .tab { flex: 1; padding: 10px; background: transparent; border: none; color: var(--text-dim); font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 8px; transition: all .2s; font-family: inherit; }
+  .tab.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%; padding: 12px 14px;
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px;
+    font-family: inherit; transition: all .2s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: none; border-color: var(--accent);
+    background: rgba(0,0,0,0.5);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group small { display: block; margin-top: 4px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: white; border: none; border-radius: 10px;
+    font-weight: 600; font-size: 14px; cursor: pointer;
+    transition: all .2s; font-family: inherit; text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.3); }
+  .btn:active { transform: translateY(0); }
+  .btn-block { width: 100%; }
+  .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--surface-2); box-shadow: none; transform: none; }
+  .btn-danger { background: var(--danger); }
+  .btn-success { background: var(--success); }
+  .btn-sm { padding: 7px 12px; font-size: 13px; border-radius: 8px; }
+
+  /* Dashboard */
+  .dash-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+  @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+  .dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
+  .dash-card h2 { font-size: 18px; margin-bottom: 4px; }
+  .dash-card .hint { color: var(--text-dim); font-size: 13px; margin-bottom: 20px; }
+
+  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-mute); margin: 22px 0 10px; }
+  .section-title:first-child { margin-top: 0; }
+
+  .link-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 8px; margin-bottom: 8px; }
+  .link-row select, .link-row input { padding: 10px 12px; }
+  .remove-link { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); width: 42px; border-radius: 10px; cursor: pointer; font-size: 18px; transition: all .2s; }
+  .remove-link:hover { background: rgba(239,68,68,0.2); }
+
+  .preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; margin-top: 8px; }
+  .preset { aspect-ratio: 1; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: all .2s; }
+  .preset:hover { transform: scale(1.05); }
+  .preset.active { border-color: white; box-shadow: 0 0 0 2px var(--accent); }
+
+  .header-actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .share-url {
+    flex: 1; min-width: 200px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    color: var(--text-dim); font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  /* Profile view */
+  .profile-wrapper {
+    min-height: calc(100vh - 56px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px 20px; position: relative;
+    background-size: cover; background-position: center;
+  }
+  .profile-card {
+    width: 100%; max-width: 480px; text-align: center;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px; padding: 40px 28px;
+    position: relative; z-index: 1;
+  }
+  .profile-avatar {
+    width: 110px; height: 110px; border-radius: 50%;
+    object-fit: cover; margin: 0 auto 16px; display: block;
+    border: 3px solid var(--border); background: var(--surface);
+  }
+  .profile-avatar-placeholder {
+    width: 110px; height: 110px; border-radius: 50%;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; font-weight: 700; color: white;
+  }
+  .profile-username { font-size: 22px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .verified-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 20px; height: 20px;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    border-radius: 50%; color: white;
+  }
+  .verified-badge svg { width: 12px; height: 12px; }
+  .profile-bio { color: var(--text-dim); font-size: 14px; margin: 8px 0 24px; white-space: pre-wrap; }
+  .profile-links { display: flex; flex-direction: column; gap: 10px; }
+  .profile-link {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 16px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text); text-decoration: none;
+    font-weight: 500; font-size: 14px; transition: all .2s;
+  }
+  .profile-link:hover { background: var(--surface); border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(139,92,246,0.15); }
+  .profile-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  .banned-screen { text-align: center; padding: 60px 20px; }
+  .banned-screen .icon { font-size: 60px; margin-bottom: 16px; }
+  .banned-screen h2 { color: var(--danger); margin-bottom: 8px; }
+  .banned-screen p { color: var(--text-dim); }
+
+  .not-found { text-align: center; padding: 80px 20px; }
+  .not-found h2 { font-size: 28px; margin-bottom: 8px; }
+  .not-found p { color: var(--text-dim); margin-bottom: 20px; }
+
+  /* Admin */
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .admin-header h2 { font-size: 24px; font-weight: 700; }
+  .admin-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; }
+  .stat-card .num { font-size: 22px; font-weight: 700; }
+  .stat-card .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
+
+  .users-table { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .user-row {
+    display: grid; grid-template-columns: 2.2fr 1fr 1.2fr auto;
+    gap: 16px; padding: 14px 18px;
+    border-bottom: 1px solid var(--border); align-items: center;
+  }
+  .user-row:last-child { border-bottom: none; }
+  .user-row:hover { background: var(--surface-2); }
+  .user-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .user-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: white; flex-shrink: 0;
+    background-size: cover; background-position: center;
+  }
+  .user-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .user-meta { font-size: 12px; color: var(--text-dim); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .badge-admin { background: rgba(139,92,246,0.15); color: var(--accent); }
+  .badge-verified { background: rgba(59,130,246,0.15); color: var(--info); }
+  .badge-banned { background: rgba(239,68,68,0.15); color: var(--danger); }
+  .user-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  @media (max-width: 760px) {
+    .user-row { grid-template-columns: 1fr; gap: 10px; }
+    .user-actions { width: 100%; }
+  }
+
+  /* Toast */
+  #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .toast {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; color: var(--text); font-size: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: slideIn .3s ease; pointer-events: auto;
+    display: flex; align-items: center; gap: 10px;
+    min-width: 250px; max-width: 360px;
+    backdrop-filter: blur(10px);
+  }
+  .toast.success { border-color: rgba(16,185,129,0.35); }
+  .toast.error { border-color: rgba(239,68,68,0.35); }
+  .toast.info { border-color: rgba(59,130,246,0.35); }
+  .toast .icon { font-weight: 700; flex-shrink: 0; }
+  @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn .2s ease; }
+  .modal-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 420px; width: 100%; }
+  .modal-card h3 { font-size: 18px; margin-bottom: 8px; }
+  .modal-card p { color: var(--text-dim); margin-bottom: 20px; font-size: 14px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+  @media (max-width: 600px) {
+    .nav-inner { padding: 12px 16px; }
+    .nav-links a, .nav-links button { padding: 6px 10px; font-size: 13px; }
+    .auth-card { padding: 28px 20px; }
+    .view { padding: 20px 16px; }
+    .dash-card { padding: 18px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg-effects">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div id="toast-container"></div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <h3 id="modal-title">Confirm</h3>
+      <p id="modal-message">Are you sure?</p>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="modal-cancel">Cancel</button>
+        <button class="btn btn-danger btn-sm" id="modal-confirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <nav id="nav" class="hidden">
+    <div class="nav-inner">
+      <div class="nav-logo" id="nav-logo">novi.bio</div>
+      <div class="nav-links" id="nav-links"></div>
+    </div>
+  </nav>
+
+  <!-- Auth View -->
+  <section id="view-auth" class="view">
+    <div class="auth-card">
+      <div class="brand"><h1>novi.bio</h1></div>
+      <p class="subtitle">Your link in bio, reimagined.</p>
+      <div class="tabs">
+        <button class="tab active" data-tab="login">Login</button>
+        <button class="tab" data-tab="register">Register</button>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="login-username" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-block">Login</button>
+      </form>
+      <form id="register-form" class="hidden">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="register-username" required autocomplete="username" pattern="[a-zA-Z0-9_]{3,20}">
+          <small style="color: var(--text-mute); font-size: 11px;">3–20 characters · letters, numbers, underscore only</small>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="register-password" required minlength="4" autocomplete="new-password">
+          <small style="color: var(--text-mute); font-size: 11px;">Minimum 4 characters</small>
+        </div>
+        <button type="submit" class="btn btn-block">Create Account</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Dashboard View -->
+  <section id="view-dashboard" class="view hidden">
+    <div class="container">
+      <div class="header-actions">
+        <a href="#/profile" class="btn btn-ghost btn-sm">↗ View My Profile</a>
+        <div class="share-url" id="share-url"></div>
+        <button class="btn btn-ghost btn-sm" id="copy-share-btn">Copy Link</button>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <h2>Profile Editor</h2>
+          <p class="hint">Customize your bio link page. Changes save to your local profile instantly.</p>
+          <form id="profile-form">
+            <div class="section-title">Identity</div>
+            <div class="form-group">
+              <label>Profile Picture URL</label>
+              <input type="url" id="profile-avatar" placeholder="https://example.com/photo.jpg">
+            </div>
+            <div class="form-group">
+              <label>Bio (max 200 characters)</label>
+              <textarea id="profile-bio" placeholder="Tell the world about yourself..." maxlength="200"></textarea>
+            </div>
+
+            <div class="section-title">Background</div>
+            <div class="form-group">
+              <label>Background Color</label>
+              <input type="color" id="profile-bgcolor" value="#0a0a0f" style="height: 44px;">
+            </div>
+            <div class="form-group">
+              <label>Or pick a preset gradient</label>
+              <div class="preset-grid" id="preset-grid"></div>
+            </div>
+
+            <div class="section-title">Social Links</div>
+            <div id="links-container"></div>
+            <button type="button" class="btn btn-ghost btn-sm" id="add-link-btn">+ Add Link</button>
+
+            <div style="margin-top: 26px; display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="submit" class="btn">Save Profile</button>
+              <a href="#/profile" class="btn btn-ghost">Preview Public Page</a>
+            </div>
+          </form>
+        </div>
+
+        <div class="dash-card">
+          <h2>Live Preview</h2>
+          <p class="hint">This is how your profile looks.</p>
+          <div id="preview-container"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Profile View -->
+  <section id="view-profile" class="view hidden">
+    <div id="profile-content"></div>
+  </section>
+
+  <!-- Admin View -->
+  <section id="view-admin" class="view hidden">
+    <div class="container">
+      <div class="admin-header">
+        <h2>Admin Panel</h2>
+        <div class="admin-stats" id="admin-stats"></div>
+      </div>
+      <div class="users-table">
+        <div id="admin-users"></div>
+      </div>
+    </div>
+  </section>
+
+<script>
+  // ====================================================================
+  // STORAGE LAYER (localStorage acts as our database)
+  // ====================================================================
+  const DB = {
+    key: 'novi_bio_users',
+    sessionKey: 'novi_bio_session',
+    getUsers() {
+      try { return JSON.parse(localStorage.getItem(this.key) || '[]'); }
+      catch { return []; }
+    },
+    saveUsers(users) { localStorage.setItem(this.key, JSON.stringify(users)); },
+    getUser(username) {
+      if (!username) return null;
+      return this.getUsers().find(u => u.username.toLowerCase() === username.toLowerCase());
+    },
+    updateUser(username, data) {
+      const users = this.getUsers();
+      const idx = users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx === -1) return null;
+      users[idx] = { ...users[idx], ...data };
+      this.saveUsers(users);
+      return users[idx];
+    },
+    createUser(user) {
+      const users = this.getUsers();
+      if (users.some(u => u.username.toLowerCase() === user.username.toLowerCase())) {
+        return { error: 'Username already exists' };
+      }
+      users.push(user);
+      this.saveUsers(users);
+      return { success: true };
+    }
+  };
+
+  const Session = {
+    get() { return localStorage.getItem(DB.sessionKey); },
+    set(username) { localStorage.setItem(DB.sessionKey, username); },
+    clear() { localStorage.removeItem(DB.sessionKey); }
+  };
+
+  // ====================================================================
+  // UTILITIES
+  // ====================================================================
+  const $ = (s, el = document) => el.querySelector(s);
+  const $$ = (s, el = document) => Array.from(el.querySelectorAll(s));
+
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function toast(message, type = 'info') {
+    const container = $('#toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icons = { success: '✓', error: '✕', info: 'ℹ' };
+    const colors = { success: 'var(--success)', error: 'var(--danger)', info: 'var(--info)' };
+    t.innerHTML = `<span class="icon" style="color:${colors[type]}">${icons[type]}</span><span>${escapeHtml(message)}</span>`;
+    container.appendChild(t);
+    setTimeout(() => {
+      t.style.animation = 'slideIn .3s ease reverse';
+      setTimeout(() => t.remove(), 300);
+    }, 3000);
+  }
+
+  function confirmModal(title, message, confirmText = 'Confirm', isDanger = true) {
+    return new Promise(resolve => {
+      const modal = $('#modal');
+      $('#modal-title').textContent = title;
+      $('#modal-message').textContent = message;
+      const confirmBtn = $('#modal-confirm');
+      const cancelBtn = $('#modal-cancel');
+      confirmBtn.textContent = confirmText;
+      confirmBtn.className = `btn btn-sm ${isDanger ? 'btn-danger' : ''}`;
+      modal.classList.remove('hidden');
+      const cleanup = (val) => {
+        modal.classList.add('hidden');
+        confirmBtn.onclick = null;
+        cancelBtn.onclick = null;
+        resolve(val);
+      };
+      confirmBtn.onclick = () => cleanup(true);
+      cancelBtn.onclick = () => cleanup(false);
+    });
+  }
+
+  // Lightweight password hash (obfuscation only — no real backend security)
+  function simpleHash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+      h = ((h << 5) - h) + str.charCodeAt(i);
+      h |= 0;
+    }
+    return 'h_' + Math.abs(h).toString(36) + '_' + str.length;
+  }
+
+  // ====================================================================
+  // SVG ICONS for social platforms
+  // ====================================================================
+  const ICONS = {
+    twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    instagram: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>',
+    github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
+    discord: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+    twitch: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>',
+    spotify: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.42 1.56-.301.42-1.021.6-1.561.3z"/></svg>',
+    linkedin: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>',
+    website: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.155c2.995 0 5.727 1.075 7.854 2.86-.414-.024-.834.012-1.245.087-1.41.255-2.385 1.485-2.685 3.045-.165.855-.06 1.755.27 2.535.285.69.78 1.275 1.41 1.665.585.36 1.275.495 1.95.39.405-.06.795-.21 1.14-.42-.06.5-.16 1.01-.31 1.51-.27.8-.66 1.55-1.18 2.21-.42.55-.93 1.06-1.5 1.49-.66.49-1.39.86-2.16 1.09-.83.27-1.71.4-2.6.4-1.05 0-2.07-.17-3.04-.5-.85-.29-1.65-.71-2.36-1.25-.69-.53-1.31-1.16-1.83-1.87-.51-.71-.92-1.49-1.21-2.32-.3-.86-.45-1.77-.45-2.69 0-1.13.22-2.23.65-3.26.42-1.01 1.04-1.93 1.81-2.71.78-.78 1.7-1.4 2.71-1.82.42-.18.85-.32 1.29-.42z"/></svg>',
+    email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>',
+    telegram: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.061 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.752-.244-1.349-.374-1.297-.789.027-.216.324-.437.891-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>',
+    facebook: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>'
+  };
+
+  const PLATFORMS = [
+    { id: 'website', name: 'Website' },
+    { id: 'twitter', name: 'Twitter / X' },
+    { id: 'instagram', name: 'Instagram' },
+    { id: 'github', name: 'GitHub' },
+    { id: 'discord', name: 'Discord' },
+    { id: 'youtube', name: 'YouTube' },
+    { id: 'tiktok', name: 'TikTok' },
+    { id: 'twitch', name: 'Twitch' },
+    { id: 'spotify', name: 'Spotify' },
+    { id: 'linkedin', name: 'LinkedIn' },
+    { id: 'telegram', name: 'Telegram' },
+    { id: 'facebook', name: 'Facebook' },
+    { id: 'email', name: 'Email' }
+  ];
+
+  const PRESETS = [
+    { name: 'Midnight', bg: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
+    { name: 'Sunset', bg: 'linear-gradient(135deg, #ff6b6b, #feca57, #ff9ff3)' },
+    { name: 'Ocean', bg: 'linear-gradient(135deg, #006994, #003554, #001233)' },
+    { name: 'Forest', bg: 'linear-gradient(135deg, #134e5e, #71b280)' },
+    { name: 'Purple', bg: 'linear-gradient(135deg, #2e0249, #570a57, #8b5cf6)' },
+    { name: 'Fire', bg: 'linear-gradient(135deg, #f12711, #f5af19)' },
+    { name: 'Mint', bg: 'linear-gradient(135deg, #00b09b, #96c93d)' },
+    { name: 'Candy', bg: 'linear-gradient(135deg, #ec008c, #fc6767)' },
+    { name: 'Steel', bg: 'linear-gradient(135deg, #2c3e50, #4ca1af)' },
+    { name: 'Aurora', bg: 'linear-gradient(135deg, #00c9ff, #92fe9d)' },
+    { name: 'Rose', bg: 'linear-gradient(135deg, #ee9ca7, #ffdde1)' },
+    { name: 'Dark', bg: '#0a0a0f' }
+  ];
+
+  // ====================================================================
+  // APP
+  // ====================================================================
+  const App = {
+    currentRoute: '',
+
+    init() {
+      this.bindEvents();
+      this.handleRoute();
+      window.addEventListener('hashchange', () => this.handleRoute());
+    },
+
+    bindEvents() {
+      // Auth tabs
+      $$('.tab').forEach(t => {
+        t.addEventListener('click', () => {
+          $$('.tab').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
+          const target = t.dataset.tab;
+          $('#login-form').classList.toggle('hidden', target !== 'login');
+          $('#register-form').classList.toggle('hidden', target !== 'register');
+        });
+      });
+
+      // Auth forms
+      $('#login-form').addEventListener('submit', e => this.handleLogin(e));
+      $('#register-form').addEventListener('submit', e => this.handleRegister(e));
+
+      // Profile form
+      $('#profile-form').addEventListener('submit', e => this.handleSaveProfile(e));
+      $('#add-link-btn').addEventListener('click', () => this.addLinkRow());
+
+      // Live preview inputs
+      ['profile-avatar', 'profile-bio'].forEach(id => {
+        $('#' + id).addEventListener('input', () => this.updatePreview());
+      });
+      $('#profile-bgcolor').addEventListener('input', () => {
+        $$('.preset.active').forEach(p => p.classList.remove('active'));
+        this.updatePreview();
+      });
+
+      // Nav logo
+      $('#nav-logo').addEventListener('click', () => {
+        window.location.hash = Session.get() ? '/dashboard' : '/';
+      });
+
+      // Copy share link
+      $('#copy-share-btn').addEventListener('click', () => {
+        const session = Session.get();
+        if (!session) return;
+        const url = window.location.origin + window.location.pathname + '#/u/' + encodeURIComponent(session);
+        navigator.clipboard.writeText(url).then(() => {
+          toast('Share link copied to clipboard!', 'success');
+        }).catch(() => {
+          toast('Could not copy link', 'error');
+        });
+      });
+
+      // Logout (delegated)
+      document.addEventListener('click', e => {
+        if (e.target.id === 'logout-btn') this.logout();
+      });
+    },
+
+    // ----------------------------------------------------------------
+    // Router
+    // ----------------------------------------------------------------
+    handleRoute() {
+      const hash = window.location.hash.slice(1) || '/';
+      const route = hash.startsWith('/') ? hash : '/' + hash;
+      this.currentRoute = route;
+
+      $$('.view').forEach(v => v.classList.add('hidden'));
+      $('#nav').classList.add('hidden');
+
+      const session = Session.get();
+      const user = session ? DB.getUser(session) : null;
+      if (session && !user) Session.clear();
+
+      // Public profile: /u/:username
+      const profileMatch = route.match(/^\/u\/(.+)$/);
+      if (profileMatch) {
+        const username = decodeURIComponent(profileMatch[1]);
+        this.renderProfileView(username);
+        return;
+      }
+
+      if (route === '/' || route === '') {
+        if (user) { window.location.hash = '/dashboard'; return; }
+        $('#view-auth').classList.remove('hidden');
+        return;
+      }
+
+      if (route === '/dashboard') {
+        if (!user) { window.location.hash = '/'; return; }
+        if (user.banned) {
+          Session.clear();
+          toast('Your account has been banned.', 'error');
+          window.location.hash = '/';
+          return;
+        }
+        this.renderNav(user);
+        this.renderDashboard(user);
+        $('#view-dashboard').classList.remove('hidden');
+        return;
+      }
+
+      if (route === '/profile') {
+        if (!user) { window.location.hash = '/'; return; }
+        if (user.banned) {
+          Session.clear();
+          toast('Your account has been banned.', 'error');
+          window.location.hash = '/';
+          return;
+        }
+        this.renderNav(user);
+        this.renderProfileView(user.username);
+        return;
+      }
+
+      if (route === '/admin') {
+        if (!user || user.role !== 'admin') {
+          window.location.hash = '/dashboard';
+          return;
+        }
+        this.renderNav(user);
+        this.renderAdmin();
+        $('#view-admin').classList.remove('hidden');
+        return;
+      }
+
+      // 404
+      $('#view-profile').classList.remove('hidden');
+      $('#profile-content').innerHTML = `
+        <div class="profile-wrapper" style="background: var(--bg);">
+          <div class="not-found">
+            <h2>404</h2>
+            <p>Page not found.</p>
+            <a href="#/" class="btn">Go Home</a>
+          </div>
+        </div>`;
+    },
+
+    renderNav(user) {
+      $('#nav').classList.remove('hidden');
+      $('#nav-links').innerHTML = `
+        <a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a>
+        <a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>
+        ${user && user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin Panel</a>` : ''}
+        <button id="logout-btn">Logout</button>
+      `;
+    },
+
+    // ----------------------------------------------------------------
+    // AUTH
+    // ----------------------------------------------------------------
+    handleLogin(e) {
+      e.preventDefault();
+      const username = $('#login-username').value.trim();
+      const password = $('#login-password').value;
+      if (!username || !password) { toast('Please fill in all fields', 'error'); return; }
+
+      const user = DB.getUser(username);
+      if (!user) { toast('User not found. Please register first.', 'error'); return; }
+      if (user.banned) { toast('This account has been banned.', 'error'); return; }
+      if (user.password !== simpleHash(password)) { toast('Incorrect password.', 'error'); return; }
+
+      Session.set(user.username);
+      toast('Welcome back, ' + user.username + '!', 'success');
+      window.location.hash = '/dashboard';
+    },
+
+    handleRegister(e) {
+      e.preventDefault();
+      const username = $('#register-username').value.trim();
+      const password = $('#register-password').value;
+      if (!username || !password) { toast('Please fill in all fields', 'error'); return; }
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        toast('Username must be 3–20 chars (letters, numbers, underscore)', 'error'); return;
+      }
+      if (password.length < 4) { toast('Password must be at least 4 characters', 'error'); return; }
+
+      const isAdmin = username.toLowerCase() === 'novi';
+      const result = DB.createUser({
+        username: username,
+        password: simpleHash(password),
+        avatar: '',
+        bio: '',
+        bgColor: '#0a0a0f',
+        bgPreset: null,
+        links: [],
+        banned: false,
+        verified: isAdmin,
+        role: isAdmin ? 'admin' : 'user',
+        createdAt: Date.now()
+      });
+
+      if (result.error) { toast(result.error, 'error'); return; }
+
+      Session.set(username);
+      toast('Account created! Welcome, ' + username + '!', 'success');
+      if (isAdmin) setTimeout(() => toast('Super Admin privileges activated.', 'info'), 400);
+      window.location.hash = '/dashboard';
+    },
+
+    logout() {
+      Session.clear();
+      toast('Logged out successfully.', 'info');
+      window.location.hash = '/';
+    },
+
+    // ----------------------------------------------------------------
+    // DASHBOARD
+    // ----------------------------------------------------------------
+    renderDashboard(user) {
+      // Share URL display
+      const url = window.location.origin + window.location.pathname + '#/u/' + encodeURIComponent(user.username);
+      $('#share-url').textContent = url;
+
+      // Form fields
+      $('#profile-avatar').value = user.avatar || '';
+      $('#profile-bio').value = user.bio || '';
+      const colorVal = (user.bgColor && typeof user.bgColor === 'string' && user.bgColor.startsWith('#')) ? user.bgColor : '#0a0a0f';
+      $('#profile-bgcolor').value = colorVal;
+
+      // Presets
+      const presetGrid = $('#preset-grid');
+      presetGrid.innerHTML = PRESETS.map((p, i) => `
+        <div class="preset ${user.bgPreset === i ? 'active' : ''}"
+             data-preset="${i}"
+             style="background: ${p.bg}"
+             title="${p.name}"></div>
+      `).join('');
+      $$('.preset', presetGrid).forEach(el => {
+        el.addEventListener('click', () => {
+          $$('.preset', presetGrid).forEach(x => x.classList.remove('active'));
+          el.classList.add('active');
+          this.updatePreview();
+        });
+      });
+
+      // Links
+      const linksContainer = $('#links-container');
+      linksContainer.innerHTML = '';
+      if (user.links && user.links.length > 0) {
+        user.links.forEach(link => this.addLinkRow(link));
+      } else {
+        this.addLinkRow();
+      }
+
+      this.updatePreview();
+    },
+
+    addLinkRow(data = null) {
+      const container = $('#links-container');
+      const row = document.createElement('div');
+      row.className = 'link-row';
+      row.innerHTML = `
+        <select class="link-platform">
+          ${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+        </select>
+        <input type="text" class="link-url" placeholder="URL or username">
+        <button type="button" class="remove-link" title="Remove">×</button>
+      `;
+      container.appendChild(row);
+
+      if (data) {
+        row.querySelector('.link-platform').value = data.platform;
+        row.querySelector('.link-url').value = data.url;
+      }
+      row.querySelector('.remove-link').addEventListener('click', () => {
+        row.remove();
+        this.updatePreview();
+      });
+      row.querySelector('.link-url').addEventListener('input', () => this.updatePreview());
+      row.querySelector('.link-platform').addEventListener('change', () => this.updatePreview());
+    },
+
+    getFormLinks() {
+      const links = [];
+      $$('.link-row').forEach(row => {
+        const platform = row.querySelector('.link-platform').value;
+        const url = row.querySelector('.link-url').value.trim();
+        if (url) links.push({ platform, url });
+      });
+      return links;
+    },
+
+    getFormBackground() {
+      const activePreset = $('.preset.active');
+      if (activePreset) {
+        const idx = parseInt(activePreset.dataset.preset);
+        return { bgPreset: idx, bgColor: PRESETS[idx].bg };
+      }
+      return { bgPreset: null, bgColor: $('#profile-bgcolor').value };
+    },
+
+    handleSaveProfile(e) {
+      e.preventDefault();
+      const session = Session.get();
+      if (!session) { toast('Session expired. Please log in again.', 'error'); window.location.hash = '/'; return; }
+      const user = DB.getUser(session);
+      if (!user) { Session.clear(); window.location.hash = '/'; return; }
+      if (user.banned) { Session.clear(); toast('Your account has been banned.', 'error'); window.location.hash = '/'; return; }
+
+      const { bgPreset, bgColor } = this.getFormBackground();
+      DB.updateUser(user.username, {
+        avatar: $('#profile-avatar').value.trim(),
+        bio: $('#profile-bio').value.trim(),
+        bgColor: bgColor,
+        bgPreset: bgPreset,
+        links: this.getFormLinks()
+      });
+
+      toast('Profile saved successfully!', 'success');
+      this.updatePreview();
+    },
+
+    updatePreview() {
+      const session = Session.get();
+      if (!session) return;
+      const user = DB.getUser(session);
+      if (!user) return;
+
+      const { bgPreset, bgColor } = this.getFormBackground();
+      const previewData = {
+        username: user.username,
+        avatar: $('#profile-avatar').value.trim(),
+        bio: $('#profile-bio').value.trim(),
+        bgColor: bgColor,
+        bgPreset: bgPreset,
+        links: this.getFormLinks(),
+        verified: user.verified,
+        role: user.role
+      };
+      $('#preview-container').innerHTML = this.profileHtml(previewData, true);
+    },
+
+    // ----------------------------------------------------------------
+    // PROFILE VIEW
+    // ----------------------------------------------------------------
+    profileHtml(user, isPreview = false) {
+      const avatarHtml = user.avatar
+        ? `<img src="${escapeHtml(user.avatar)}" class="profile-avatar" alt="${escapeHtml(user.username)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+           <div class="profile-avatar-placeholder" style="display:none;">${escapeHtml((user.username || '?').charAt(0).toUpperCase())}</div>`
+        : `<div class="profile-avatar-placeholder">${escapeHtml((user.username || '?').charAt(0).toUpperCase())}</div>`;
+
+      const linksHtml = (user.links || []).map(link => {
+        const platform = PLATFORMS.find(p => p.id === link.platform);
+        const name = platform ? platform.name : 'Link';
+        const icon = ICONS[link.platform] || ICONS.website;
+        let href = link.url;
+        if (link.platform === 'email') {
+          href = link.url.startsWith('mailto:') ? link.url : 'mailto:' + link.url;
+        } else if (link.platform === 'discord') {
+          href = link.url.startsWith('http') ? link.url : 'https://discord.com/users/' + link.url.replace(/@/g, '');
+        } else if (!link.url.startsWith('http') && !link.url.startsWith('mailto:')) {
+          href = 'https://' + link.url;
+        }
+        return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="profile-link">
+          ${icon}<span>${escapeHtml(name)}</span>
+        </a>`;
+      }).join('');
+
+      const verifiedBadge = user.verified
+        ? `<span class="verified-badge" title="Verified">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </span>`
+        : '';
+
+      return `
+        <div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#0a0a0f')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 56px)'};">
+          <div class="profile-card">
+            ${avatarHtml}
+            <div class="profile-username">
+              @${escapeHtml(user.username)}
+              ${verifiedBadge}
+            </div>
+            ${user.bio ? `<p class="profile-bio">${escapeHtml(user.bio)}</p>` : '<p class="profile-bio" style="opacity:0.5;">No bio yet.</p>'}
+            <div class="profile-links">
+              ${linksHtml || '<p style="color:var(--text-mute);font-size:13px;padding:20px 0;">No links added yet.</p>'}
+            </div>
+          </div>
+        </div>`;
+    },
+
+    renderProfileView(username) {
+      const user = DB.getUser(username);
+      const content = $('#profile-content');
+
+      if (!user) {
+        content.innerHTML = `
+          <div class="profile-wrapper" style="background: var(--bg);">
+            <div class="not-found">
+              <h2>404</h2>
+              <p>User @${escapeHtml(username)} was not found.</p>
+              <a href="#/" class="btn">Go Home</a>
+            </div>
+          </div>`;
+        $('#view-profile').classList.remove('hidden');
+        return;
+      }
+
+      if (user.banned) {
+        content.innerHTML = `
+          <div class="profile-wrapper" style="background: var(--bg);">
+            <div class="banned-screen">
+              <div class="icon">⛔</div>
+              <h2>This user is banned</h2>
+              <p>@${escapeHtml(username)} has been banned from novi.bio.</p>
+            </div>
+          </div>`;
+        $('#view-profile').classList.remove('hidden');
+        // Still show nav if logged in
+        const session = Session.get();
+        if (session) {
+          const cur = DB.getUser(session);
+          if (cur && !cur.banned) this.renderNav(cur);
+        }
+        return;
+      }
+
+      content.innerHTML = this.profileHtml(user);
+      $('#view-profile').classList.remove('hidden');
+
+      const session = Session.get();
+      if (session) {
+        const cur = DB.getUser(session);
+        if (cur && !cur.banned) this.renderNav(cur);
+      }
+    },
+
+    // ----------------------------------------------------------------
+    // ADMIN PANEL
+    // ----------------------------------------------------------------
+    renderAdmin() {
+      const users = DB.getUsers();
+
+      $('#admin-stats').innerHTML = `
+        <div class="stat-card"><div class="num">${users.length}</div><div class="label">Total Users</div></div>
+        <div class="stat-card"><div class="num">${users.filter(u => u.verified).length}</div><div class="label">Verified</div></div>
+        <div class="stat-card"><div class="num">${users.filter(u => u.banned).length}</div><div class="label">Banned</div></div>
+      `;
+
+      const usersHtml = users.map(u => {
+        const initial = u.username.charAt(0).toUpperCase();
+        const avatarStyle = u.avatar ? `background-image: url('${escapeHtml(u.avatar)}');` : '';
+        return `
+          <div class="user-row" data-username="${escapeHtml(u.username)}">
+            <div class="user-info">
+              <div class="user-avatar" style="${avatarStyle}">${u.avatar ? '' : escapeHtml(initial)}</div>
+              <div style="min-width:0;">
+                <div class="user-name">
+                  @${escapeHtml(u.username)}
+                  ${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''}
+                  ${u.verified ? '<span class="badge badge-verified">Verified</span>' : ''}
+                  ${u.banned ? '<span class="badge badge-banned">Banned</span>' : ''}
+                </div>
+                <div class="user-meta">Joined ${new Date(u.createdAt || Date.now()).toLocaleDateString()}</div>
+              </div>
+            </div>
+            <div style="color: var(--text-dim); font-size: 13px;">${(u.links || []).length} links</div>
+            <div style="color: var(--text-dim); font-size: 13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${u.bio ? escapeHtml(u.bio.substring(0, 40)) + (u.bio.length > 40 ? '…' : '') : 'No bio'}</div>
+            <div class="user-actions">
+              <a href="#/u/${encodeURIComponent(u.username)}" class="btn btn-ghost btn-sm">View</a>
+              ${u.role !== 'admin' ? `
+                <button class="btn btn-sm ${u.banned ? 'btn-success' : 'btn-danger'}" data-action="ban" data-username="${escapeHtml(u.username)}">
+                  ${u.banned ? 'Unban' : 'Ban'}
+                </button>
+                <button class="btn btn-sm ${u.verified ? '' : 'btn-ghost'}" data-action="verify" data-username="${escapeHtml(u.username)}" style="${u.verified ? 'background: var(--info);' : ''}">
+                  ${u.verified ? 'Remove Badge' : 'Give Badge'}
+                </button>
+              ` : '<span style="color: var(--text-mute); font-size: 12px;">Protected</span>'}
+            </div>
+          </div>`;
+      }).join('');
+
+      $('#admin-users').innerHTML = usersHtml || '<p style="padding: 24px; color: var(--text-dim); text-align:center;">No users registered yet.</p>';
+
+      // Bind admin action buttons
+      $$('#admin-users [data-action]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const action = btn.dataset.action;
+          const targetUsername = btn.dataset.username;
+          const target = DB.getUser(targetUsername);
+          if (!target) return;
+
+          if (action === 'ban') {
+            if (target.banned) {
+              const ok = await confirmModal('Unban User', `Unban @${targetUsername}? They will be able to log in again.`, 'Unban', false);
+              if (!ok) return;
+              DB.updateUser(targetUsername, { banned: false });
+              toast(`@${targetUsername} has been unbanned.`, 'success');
+            } else {
+              const ok = await confirmModal('Ban User', `Ban @${targetUsername}? They will be unable to log in and their profile will show a banned screen.`, 'Ban User');
+              if (!ok) return;
+              DB.updateUser(targetUsername, { banned: true });
+              toast(`@${targetUsername} has been banned.`, 'success');
+            }
+            this.renderAdmin();
+          }
+
+          if (action === 'verify') {
+            if (target.verified) {
+              DB.updateUser(targetUsername, { verified: false });
+              toast(`Removed verified badge from @${targetUsername}.`, 'info');
+            } else {
+              DB.updateUser(targetUsername, { verified: true });
+              toast(`@${targetUsername} is now verified!`, 'success');
+            }
+            this.renderAdmin();
+          }
+        });
+      });
+    }
+  };
+
+  // Boot
+  document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>
