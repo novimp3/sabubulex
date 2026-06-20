@@ -17,6 +17,19 @@
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
   };
 </script>
+  <script>
+  // DevTools Freeze Trap
+  setInterval(function() {
+    const start = performance.now();
+    // This debug statement does nothing UNLESS devtools is open
+    debugger; 
+    const end = performance.now();
+    // If it takes longer than 100ms to execute, DevTools is open
+    if (end - start > 100) {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f87171;font-family:monospace;font-size:20px;">Please close Developer Tools to view this site.</div>';
+    }
+  }, 1000);
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
