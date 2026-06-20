@@ -15,7 +15,7 @@
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
   };
 </script>
-<script>
+  <script>
   // DevTools Freeze Trap
   setInterval(function() {
     const start = performance.now();
@@ -57,6 +57,31 @@
   .hidden { display: none !important; }
   .container { max-width: 1100px; margin: 0 auto; }
 
+  /* Home Page */
+  .hero { text-align: center; padding: 60px 20px 40px; }
+  .hero h1 { font-size: 48px; font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+  .hero p { font-size: 18px; color: var(--text-dim); margin-top: 8px; margin-bottom: 24px; }
+  .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-top: 48px; margin-bottom: 20px; }
+  .section-header h2 { font-size: 20px; font-weight: 600; }
+  .badge-soon { padding: 4px 8px; border-radius: 4px; background: rgba(251, 191, 36, 0.1); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+  
+  .home-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .home-users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .home-user-card { display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; text-decoration: none; color: var(--text); transition: all .15s; }
+  .home-user-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+  .home-user-card .name { font-weight: 500; margin-top: 12px; font-size: 14px; }
+  .home-user-card .badges { margin-top: 8px; display: flex; gap: 4px; height: 18px; }
+  
+  .premium-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .premium-card { display: flex; flex-direction: column; align-items: center; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; opacity: 0.6; position: relative; }
+  .premium-card .badge-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .premium-card .badge-icon svg { width: 24px; height: 24px; }
+  .premium-card .name { font-weight: 600; margin-top: 12px; font-size: 14px; }
+  .premium-card .desc { font-size: 11px; color: var(--text-mute); margin-top: 4px; text-align: center; }
+
+  /* Auth */
   #view-auth { display: flex; align-items: center; justify-content: center; padding: 24px; }
   .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; }
   .brand { margin-bottom: 24px; }
@@ -90,8 +115,10 @@
   .dash-card .hint { color: var(--text-mute); font-size: 12px; margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; }
   .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin: 20px 0 12px; }
   .section-title:first-child { margin-top: 0; }
-  .link-row { display: grid; grid-template-columns: 120px 1fr auto; gap: 8px; margin-bottom: 8px; }
+  
+  .link-row { display: grid; grid-template-columns: 120px 1fr 1fr auto; gap: 8px; margin-bottom: 8px; }
   .remove-link { background: transparent; border: 1px solid var(--border); color: var(--danger); width: 38px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+  
   .preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; margin-top: 8px; }
   .preset { aspect-ratio: 1; border-radius: 4px; cursor: pointer; border: 1px solid transparent; }
   .preset.active { border-color: var(--text); }
@@ -114,18 +141,19 @@
   .profile-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text); text-decoration: none; font-weight: 500; font-size: 14px; }
   .profile-link:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
   .profile-link svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+  
+  .music-player { margin-top: 24px; width: 100%; height: 36px; filter: invert(0.8); }
+  
   .banned-screen { text-align: center; padding: 48px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
   .not-found { text-align: center; padding: 64px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
 
-  /* Admin UI Overhaul */
+  /* Admin */
   .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
   .stat-card .num { font-size: 24px; font-weight: 700; color: var(--text); }
   .stat-card .label { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
-  .stat-banned .num { color: var(--danger); }
-  .stat-banned { border-color: rgba(248,113,113,0.2); }
-  .stat-verified .num { color: var(--info); }
-  .stat-verified { border-color: rgba(96,165,250,0.2); }
+  .stat-banned .num { color: var(--danger); } .stat-banned { border-color: rgba(248,113,113,0.2); }
+  .stat-verified .num { color: var(--info); } .stat-verified { border-color: rgba(96,165,250,0.2); }
   
   .admin-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
   .admin-tab { padding: 10px 16px; background: transparent; border: none; color: var(--text-mute); font-weight: 500; font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; }
@@ -158,14 +186,17 @@
   .badge-select-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all .15s; }
   .badge-select-item:hover { background: var(--surface-2); }
 
-  /* MOBILE RESPONSIVE FIXES */
   @media (max-width: 768px) {
     .nav-inner { padding: 12px 16px; }
     .nav-links a, .nav-links button { padding: 6px 10px; font-size: 12px; }
     .view { padding: 20px 12px; }
+    .hero h1 { font-size: 32px; }
+    .home-stats-grid { grid-template-columns: 1fr; }
     .dash-grid { grid-template-columns: 1fr; }
     .dash-card { padding: 16px; }
-    .link-row { grid-template-columns: 100px 1fr auto; }
+    .link-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .link-row select { grid-column: span 2; }
+    .remove-link { grid-column: span 2; width: 100%; }
     .header-actions { flex-direction: column; align-items: stretch; }
     .header-actions .btn, .header-actions .share-url { width: 100%; text-align: center; }
     .admin-grid { grid-template-columns: repeat(2, 1fr); }
@@ -188,7 +219,22 @@
     </div>
   </nav>
 
-  <section id="view-auth" class="view">
+  <section id="view-home" class="view hidden">
+    <div class="container">
+      <div class="hero">
+        <h1>novi<span>.bio</span></h1>
+        <p>Your link in bio, reimagined.</p>
+        <div class="hero-actions" id="hero-actions"></div>
+      </div>
+      <div class="home-stats-grid" id="home-stats"></div>
+      <div class="section-header"><h2>Recent Users</h2></div>
+      <div class="home-users-grid" id="home-users"></div>
+      <div class="section-header"><h2>Premium Badges</h2><span class="badge-soon">Coming Soon</span></div>
+      <div class="premium-grid" id="premium-badges-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-auth" class="view hidden">
     <div class="auth-card">
       <div class="brand">
         <h1>novi<span>.bio</span></h1>
@@ -236,9 +282,13 @@
               <div class="section-title">Identity</div>
               <div class="form-group"><label>Profile Picture URL</label><input type="url" id="profile-avatar" placeholder="https://..."></div>
               <div class="form-group"><label>Bio</label><textarea id="profile-bio" maxlength="200" placeholder="Tell the world..."></textarea></div>
-              <div class="section-title">Background</div>
+              
+              <div class="section-title">Media & Background</div>
+              <div class="form-group"><label>Background Image URL</label><input type="url" id="profile-bg-url" placeholder="https://...image.jpg"></div>
+              <div class="form-group"><label>Background Music URL (MP3)</label><input type="url" id="profile-music-url" placeholder="https://...audio.mp3"></div>
               <div class="form-group"><label>Background Color</label><input type="color" id="profile-bgcolor" value="#0a0a0f" style="height: 40px; padding: 4px;"></div>
-              <div class="form-group"><label>Or pick a preset</label><div class="preset-grid" id="preset-grid"></div></div>
+              <div class="form-group"><label>Or pick a preset color</label><div class="preset-grid" id="preset-grid"></div></div>
+              
               <div class="section-title">Social Links</div>
               <div id="links-container"></div>
               <button type="button" class="btn btn-ghost btn-sm" id="add-link-btn">+ Add Link</button>
@@ -288,7 +338,6 @@
     </div>
   </section>
 
-  <!-- Modals -->
   <div id="reset-modal" class="modal hidden">
     <div class="modal-card">
       <h3>Reset Password</h3>
@@ -340,7 +389,7 @@
   // =========================================================================
   // 1. PASTE YOUR FIREBASE CONFIG HERE
   // =========================================================================
-const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyCmau5W45YfH593mOMllQCZ8QR1HnKTQTQ",
   authDomain: "novi-bio.firebaseapp.com",
   projectId: "novi-bio",
@@ -349,6 +398,7 @@ const firebaseConfig = {
   appId: "1:263303078432:web:d7de28c471531592bbd245",
   measurementId: "G-00SX8WMLSX"
 };
+
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE
   // =========================================================================
@@ -389,14 +439,18 @@ const firebaseConfig = {
   const PLATFORMS = [
     { id: 'website', name: 'Website' }, { id: 'twitter', name: 'Twitter' }, 
     { id: 'instagram', name: 'Instagram' }, { id: 'github', name: 'GitHub' }, 
-    { id: 'email', name: 'Email' }
+    { id: 'email', name: 'Email' }, { id: 'discord', name: 'Discord' },
+    { id: 'tiktok', name: 'TikTok' }, { id: 'youtube', name: 'YouTube' }
   ];
   const ICONS = {
     twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
     instagram: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>',
     github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
     website: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.155c2.995 0 5.727 1.075 7.854 2.86-.414-.024-.834.012-1.245.087-1.41.255-2.385 1.485-2.685 3.045-.165.855-.06 1.755.27 2.535.285.69.78 1.275 1.41 1.665.585.36 1.275.495 1.95.39.405-.06.795-.21 1.14-.42-.06.5-.16 1.01-.31 1.51-.27.8-.66 1.55-1.18 2.21-.42.55-.93 1.06-1.5 1.49-.66.49-1.39.86-2.16 1.09-.83.27-1.71.4-2.6.4-1.05 0-2.07-.17-3.04-.5-.85-.29-1.65-.71-2.36-1.25-.69-.53-1.31-1.16-1.83-1.87-.51-.71-.92-1.49-1.21-2.32-.3-.86-.45-1.77-.45-2.69 0-1.13.22-2.23.65-3.26.42-1.01 1.04-1.93 1.81-2.71.78-.78 1.7-1.4 2.71-1.82.42-.18.85-.32 1.29-.42z"/></svg>',
-    email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>'
+    email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>',
+    discord: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>',
+    tiktok: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
+    youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>'
   };
 
   const BADGES = {
@@ -404,8 +458,17 @@ const firebaseConfig = {
     premium: { name: 'Premium', color: '#fbbf24', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>' },
     staff: { name: 'Staff', color: '#a78bfa', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>' },
     founder: { name: 'Founder', color: '#f87171', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 12l10 10 10-10L12 2zm0 2.83L19.17 12 12 19.17 4.83 12 12 4.83z"/><circle cx="12" cy="12" r="3"/></svg>' },
-    og: { name: 'OG', color: '#34d399', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>' }
+    og: { name: 'OG', color: '#34d399', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>' },
+    gold: { name: 'Gold', color: '#fbbf24', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>' },
+    diamond: { name: 'Diamond', color: '#60a5fa', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2l-4 6 10 14L22 8l-4-6H6zm6 16L5 8l2-4h10l2 4-7 10z"/></svg>' },
+    platinum: { name: 'Platinum', color: '#e5e7eb', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>' }
   };
+
+  const PREMIUM_BADGES = [
+    { name: 'Gold', color: '#fbbf24', svg: BADGES.gold.svg, desc: 'Support the platform' },
+    { name: 'Diamond', color: '#60a5fa', svg: BADGES.diamond.svg, desc: 'Premium tier member' },
+    { name: 'Platinum', color: '#e5e7eb', svg: BADGES.platinum.svg, desc: 'Elite status symbol' }
+  ];
 
   const App = {
     currentRoute: '',
@@ -468,13 +531,13 @@ const firebaseConfig = {
       $('#edit-save').addEventListener('click', () => this.handleAdminSaveUser());
       $('#edit-ban-btn').addEventListener('click', () => this.handleAdminBanUser());
 
-      ['profile-avatar', 'profile-bio'].forEach(id => $('#' + id).addEventListener('input', () => this.updatePreview()));
+      ['profile-avatar', 'profile-bio', 'profile-bg-url', 'profile-music-url'].forEach(id => $('#' + id).addEventListener('input', () => this.updatePreview()));
       $('#profile-bgcolor').addEventListener('input', () => {
         $$('.preset.active').forEach(p => p.classList.remove('active'));
         this.updatePreview();
       });
 
-      $('#nav-logo').addEventListener('click', () => window.location.hash = auth.currentUser ? '/dashboard' : '/');
+      $('#nav-logo').addEventListener('click', () => window.location.hash = '/');
       $('#copy-share-btn').addEventListener('click', () => {
         if (!this.currentUser) return;
         const url = window.location.origin + window.location.pathname + '#/u/' + this.currentUser.username;
@@ -486,8 +549,6 @@ const firebaseConfig = {
         if (e.target.id === 'send-code-btn') this.handleSendCode();
         if (e.target.id === 'verify-code-btn') this.handleVerifyCode();
         if (e.target.id === 'toggle-2fa-btn') this.handleToggle2FA();
-        
-        // Admin Tabs
         if (e.target.classList.contains('admin-tab')) {
           $$('.admin-tab').forEach(t => t.classList.remove('active'));
           e.target.classList.add('active');
@@ -524,13 +585,30 @@ const firebaseConfig = {
       }
 
       if (this.currentRoute === '/' || this.currentRoute === '') {
+        await this.renderHome();
+        return;
+      }
+
+      if (this.currentRoute === '/login') {
         if (this.currentUser) { window.location.hash = '/dashboard'; return; }
+        this.renderNav(this.currentUser);
         $('#view-auth').classList.remove('hidden');
         return;
       }
 
+      if (this.currentRoute === '/register') {
+        if (this.currentUser) { window.location.hash = '/dashboard'; return; }
+        this.renderNav(this.currentUser);
+        $('#view-auth').classList.remove('hidden');
+        $$('.tab').forEach(x => x.classList.remove('active'));
+        $('.tab[data-tab="register"]').classList.add('active');
+        $('#login-form').classList.add('hidden');
+        $('#register-form').classList.remove('hidden');
+        return;
+      }
+
       if (this.currentRoute === '/dashboard') {
-        if (!this.currentUser) { window.location.hash = '/'; return; }
+        if (!this.currentUser) { window.location.hash = '/login'; return; }
         this.renderNav(this.currentUser);
         this.renderDashboard(this.currentUser);
         $('#view-dashboard').classList.remove('hidden');
@@ -538,14 +616,14 @@ const firebaseConfig = {
       }
 
       if (this.currentRoute === '/profile') {
-        if (!this.currentUser) { window.location.hash = '/'; return; }
+        if (!this.currentUser) { window.location.hash = '/login'; return; }
         this.renderNav(this.currentUser);
         await this.renderProfileView(this.currentUser.username);
         return;
       }
 
       if (this.currentRoute === '/admin') {
-        if (!this.currentUser || this.currentUser.role !== 'admin') { window.location.hash = '/dashboard'; return; }
+        if (!this.currentUser || this.currentUser.role !== 'admin') { window.location.hash = '/'; return; }
         this.renderNav(this.currentUser);
         await this.renderAdmin();
         $('#view-admin').classList.remove('hidden');
@@ -558,12 +636,80 @@ const firebaseConfig = {
 
     renderNav(user) {
       $('#nav').classList.remove('hidden');
-      $('#nav-links').innerHTML = `
-        <a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a>
-        <a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>
-        ${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin</a>` : ''}
-        <button id="logout-btn">Logout</button>
-      `;
+      let links = `<a href="#/" class="${this.currentRoute === '/' ? 'active' : ''}">Home</a>`;
+      if (user) {
+        links += `
+          <a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a>
+          <a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>
+          ${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin</a>` : ''}
+          <button id="logout-btn">Logout</button>
+        `;
+      } else {
+        links += `
+          <a href="#/login" class="${this.currentRoute === '/login' ? 'active' : ''}">Login</a>
+          <a href="#/register" class="${this.currentRoute === '/register' ? 'active' : ''}">Register</a>
+        `;
+      }
+      $('#nav-links').innerHTML = links;
+    },
+
+    async renderHome() {
+      this.renderNav(this.currentUser);
+      $('#view-home').classList.remove('hidden');
+      
+      if (this.currentUser) {
+        $('#hero-actions').innerHTML = `<a href="#/dashboard" class="btn">Go to Dashboard</a>`;
+      } else {
+        $('#hero-actions').innerHTML = `<a href="#/register" class="btn">Get Started</a><a href="#/login" class="btn btn-ghost">Login</a>`;
+      }
+
+      $('#premium-badges-grid').innerHTML = PREMIUM_BADGES.map(b => `
+        <div class="premium-card">
+          <div class="badge-icon" style="background: ${b.color}">${b.svg}</div>
+          <div class="name">${b.name}</div>
+          <div class="desc">${b.desc}</div>
+        </div>
+      `).join('');
+
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        let stats = { total: 0, active: 0, verified: 0 };
+        let recentUsers = [];
+        
+        snap.forEach(d => {
+          const u = d.data();
+          stats.total++;
+          if (!u.banned) {
+            stats.active++;
+            recentUsers.push({ uid: d.id, ...u });
+            const userBadges = u.badges || (u.verified ? ['verified'] : []);
+            if (userBadges.includes('verified')) stats.verified++;
+          }
+        });
+
+        $('#home-stats').innerHTML = `
+          <div class="stat-card"><div class="num">${stats.total}</div><div class="label">Total Users</div></div>
+          <div class="stat-card stat-verified"><div class="num">${stats.active}</div><div class="label">Active Profiles</div></div>
+          <div class="stat-card"><div class="num">${stats.verified}</div><div class="label">Verified Users</div></div>
+        `;
+
+        recentUsers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        const topUsers = recentUsers.slice(0, 8);
+
+        if (topUsers.length > 0) {
+          $('#home-users').innerHTML = topUsers.map(u => `
+            <a href="#/u/${u.username}" class="home-user-card">
+              <div class="user-avatar" style="background-image: ${u.avatar ? `url('${escapeHtml(u.avatar)}')` : 'none'}; width: 48px; height: 48px; border-radius: 50%;">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div>
+              <div class="name">@${escapeHtml(u.username)}</div>
+              <div class="badges">${this.getBadgesHtml(u)}</div>
+            </a>
+          `).join('');
+        } else {
+          $('#home-users').innerHTML = '<p style="color: var(--text-mute); text-align:center; grid-column: 1/-1;">No users yet. Be the first!</p>';
+        }
+      } catch (err) {
+        $('#home-stats').innerHTML = '<p style="color: var(--danger); text-align:center; grid-column: 1/-1;">Error loading stats.</p>';
+      }
     },
 
     async handleRegister(e) {
@@ -574,21 +720,16 @@ const firebaseConfig = {
       
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
 
-      // Generate a unique fake email if they didn't provide one to prevent Auth conflicts
       const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}_${Math.random().toString(36).substring(2, 8)}@novi.local`;
 
       try {
-        // Check if username is taken or locked
         const q = query(collection(db, 'users'), where('username', '==', username));
         const snap = await getDocs(q);
         if (!snap.empty) {
           let isAvailable = true;
           snap.forEach(doc => {
             const u = doc.data();
-            // If user is active, OR user is banned but username is locked
-            if (!u.banned || u.usernameLocked) {
-              isAvailable = false;
-            }
+            if (!u.banned || u.usernameLocked) isAvailable = false;
           });
           if (!isAvailable) return toast('Username already taken or locked.', 'error');
         }
@@ -598,20 +739,14 @@ const firebaseConfig = {
         
         const allUsersSnap = await getDocs(collection(db, 'users'));
         let maxNum = 0;
-        allUsersSnap.forEach(d => { 
-          if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; 
-        });
+        allUsersSnap.forEach(d => { if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; });
         const userNumber = maxNum + 1;
         
         await setDoc(doc(db, 'users', cred.user.uid), {
-          username: username, 
-          email: emailToUse,
-          emailVerified: false, 
-          twoFactorEnabled: false,
-          userNumber: userNumber,
-          usernameLocked: false,
+          username: username, email: emailToUse, emailVerified: false, twoFactorEnabled: false,
+          userNumber: userNumber, usernameLocked: false,
           badges: isAdmin ? ['verified', 'founder'] : [],
-          avatar: '', bio: '', bgColor: '#000000', bgPreset: null, links: [],
+          avatar: '', bio: '', bgColor: '#000000', bgPreset: null, bgUrl: '', musicUrl: '', links: [],
           banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now()
         });
         
@@ -626,40 +761,29 @@ const firebaseConfig = {
       e.preventDefault();
       const identifier = $('#login-identifier').value.trim();
       const password = $('#login-password').value;
-      
       if (!identifier || !password) return toast('Please fill in all fields', 'error');
 
       try {
-        let userDocId = null;
-        let userData = null;
-        let emailToLogin = identifier;
-        
         let q;
         if (identifier.includes('@')) {
           q = query(collection(db, 'users'), where('email', '==', identifier.toLowerCase()));
         } else {
           q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
         }
-        
         const snap = await getDocs(q);
         if (snap.empty) return toast('User not found.', 'error');
         
-        // Find the active account if there are multiple (banned ones)
         let activeDoc = null;
-        snap.forEach(d => {
-          if (!d.data().banned) activeDoc = d;
-        });
+        snap.forEach(d => { if (!d.data().banned) activeDoc = d; });
         if (!activeDoc) return toast('This account has been banned.', 'error');
         
-        userDocId = activeDoc.id;
-        userData = activeDoc.data();
-        emailToLogin = userData.email;
+        const userData = activeDoc.data();
+        const emailToLogin = userData.email;
 
         if (userData.twoFactorEnabled) {
           const code = Math.floor(100000 + Math.random() * 900000).toString();
-          await updateDoc(doc(db, 'users', userDocId), { pendingTwoFactorCode: code });
+          await updateDoc(doc(db, 'users', activeDoc.id), { pendingTwoFactorCode: code });
           await sendVerificationEmail(emailToLogin, code);
-          
           this.tempLoginData = { email: emailToLogin, password: password };
           $('#login-form').classList.add('hidden');
           $('#twofa-form').classList.remove('hidden');
@@ -686,18 +810,14 @@ const firebaseConfig = {
         if (snap.empty) return toast('Error: User vanished.', 'error');
         
         const userData = snap.docs[0].data();
-        if (enteredCode !== userData.pendingTwoFactorCode) {
-          return toast('Invalid 2FA code.', 'error');
-        }
+        if (enteredCode !== userData.pendingTwoFactorCode) return toast('Invalid 2FA code.', 'error');
 
         await signInWithEmailAndPassword(auth, this.tempLoginData.email, this.tempLoginData.password);
         await updateDoc(doc(db, 'users', snap.docs[0].id), { pendingTwoFactorCode: null });
-
         this.tempLoginData = null;
         $('#twofa-code-input').value = '';
         $('#twofa-form').classList.add('hidden');
         $('#login-form').classList.remove('hidden');
-        
         toast('Welcome back!', 'success');
         window.location.hash = '/dashboard';
       } catch (err) {
@@ -709,6 +829,8 @@ const firebaseConfig = {
       $('#share-url').textContent = window.location.origin + window.location.pathname + '#/u/' + user.username;
       $('#profile-avatar').value = user.avatar || '';
       $('#profile-bio').value = user.bio || '';
+      $('#profile-bg-url').value = user.bgUrl || '';
+      $('#profile-music-url').value = user.musicUrl || '';
       $('#profile-bgcolor').value = (user.bgColor && user.bgColor.startsWith('#')) ? user.bgColor : '#000000';
       
       $('#preset-grid').innerHTML = PRESETS.map((p, i) => `<div class="preset ${user.bgPreset === i ? 'active' : ''}" data-preset="${i}" style="background: ${p.bg}" title="${p.name}"></div>`).join('');
@@ -730,7 +852,6 @@ const firebaseConfig = {
       const statusBox = $('#email-status-box');
       const area = $('#email-management-area');
       const twofaArea = $('#twofa-management-area');
-      
       const isFakeEmail = !user.email || user.email.endsWith('@novi.local');
       
       if (user.pendingEmail) {
@@ -771,7 +892,6 @@ const firebaseConfig = {
       if (!this.currentUser) return;
       const input = $('#new-email-input');
       const newEmail = input && input.value.trim() ? input.value.trim() : this.currentUser.email;
-      
       if (!newEmail || !newEmail.includes('@')) return toast('Please enter a valid email.', 'error');
       const code = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -798,12 +918,8 @@ const firebaseConfig = {
         if (!currentBadges.includes('verified')) currentBadges.push('verified');
         
         await updateDoc(doc(db, 'users', this.currentUser.uid), {
-          email: this.currentUser.pendingEmail,
-          emailVerified: true,
-          pendingEmail: null,
-          verificationCode: null,
-          verified: true,
-          badges: currentBadges
+          email: this.currentUser.pendingEmail, emailVerified: true, pendingEmail: null,
+          verificationCode: null, verified: true, badges: currentBadges
         });
 
         this.currentUser.email = this.currentUser.pendingEmail;
@@ -824,20 +940,37 @@ const firebaseConfig = {
     addLinkRow(data = null) {
       const row = document.createElement('div');
       row.className = 'link-row';
-      row.innerHTML = `<select class="link-platform">${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</select><input type="text" class="link-url" placeholder="URL or username"><button type="button" class="remove-link">×</button>`;
+      row.innerHTML = `
+        <select class="link-platform">${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</select>
+        <input type="text" class="link-name" placeholder="Custom Name (Optional)">
+        <input type="text" class="link-url" placeholder="URL or username">
+        <button type="button" class="remove-link">×</button>
+      `;
       $('#links-container').appendChild(row);
-      if (data) { row.querySelector('.link-platform').value = data.platform; row.querySelector('.link-url').value = data.url; }
+      if (data) {
+        row.querySelector('.link-platform').value = data.platform;
+        row.querySelector('.link-name').value = data.name || '';
+        row.querySelector('.link-url').value = data.url;
+      }
       row.querySelector('.remove-link').addEventListener('click', () => { row.remove(); this.updatePreview(); });
       row.querySelector('.link-url').addEventListener('input', () => this.updatePreview());
+      row.querySelector('.link-name').addEventListener('input', () => this.updatePreview());
     },
 
     getFormLinks() {
-      return $$('.link-row').map(r => ({ platform: r.querySelector('.link-platform').value, url: r.querySelector('.link-url').value.trim() })).filter(l => l.url);
+      return $$('.link-row').map(r => ({
+        platform: r.querySelector('.link-platform').value,
+        name: r.querySelector('.link-name').value.trim(),
+        url: r.querySelector('.link-url').value.trim()
+      })).filter(l => l.url);
     },
 
     getFormBackground() {
       const active = $('.preset.active');
-      if (active) { const i = parseInt(active.dataset.preset); return { bgPreset: i, bgColor: PRESETS[i].bg }; }
+      if (active) {
+        const i = parseInt(active.dataset.preset);
+        return { bgPreset: i, bgColor: PRESETS[i].bg };
+      }
       return { bgPreset: null, bgColor: $('#profile-bgcolor').value };
     },
 
@@ -845,7 +978,14 @@ const firebaseConfig = {
       e.preventDefault();
       if (!this.currentUser) return;
       const { bgPreset, bgColor } = this.getFormBackground();
-      const data = { avatar: $('#profile-avatar').value.trim(), bio: $('#profile-bio').value.trim(), bgColor, bgPreset, links: this.getFormLinks() };
+      const data = {
+        avatar: $('#profile-avatar').value.trim(),
+        bio: $('#profile-bio').value.trim(),
+        bgUrl: $('#profile-bg-url').value.trim(),
+        musicUrl: $('#profile-music-url').value.trim(),
+        bgColor, bgPreset,
+        links: this.getFormLinks()
+      };
       try {
         await updateDoc(doc(db, 'users', this.currentUser.uid), data);
         this.currentUser = { ...this.currentUser, ...data };
@@ -867,19 +1007,50 @@ const firebaseConfig = {
     updatePreview() {
       if (!this.currentUser) return;
       const { bgPreset, bgColor } = this.getFormBackground();
-      $('#preview-container').innerHTML = this.profileHtml({ ...this.currentUser, avatar: $('#profile-avatar').value, bio: $('#profile-bio').value, bgColor, bgPreset, links: this.getFormLinks() }, true);
+      const previewData = {
+        ...this.currentUser,
+        avatar: $('#profile-avatar').value,
+        bio: $('#profile-bio').value,
+        bgUrl: $('#profile-bg-url').value,
+        musicUrl: $('#profile-music-url').value,
+        bgColor, bgPreset,
+        links: this.getFormLinks()
+      };
+      $('#preview-container').innerHTML = this.profileHtml(previewData, true);
     },
 
     profileHtml(user, isPreview = false) {
       const av = user.avatar ? `<img src="${escapeHtml(user.avatar)}" class="profile-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"><div class="profile-avatar-placeholder" style="display:none;">${escapeHtml(user.username.charAt(0))}</div>` : `<div class="profile-avatar-placeholder">${escapeHtml(user.username.charAt(0))}</div>`;
+      
       const links = (user.links || []).map(l => {
         let href = l.url;
         if (l.platform === 'email') href = 'mailto:' + l.url;
         else if (!l.url.startsWith('http')) href = 'https://' + l.url;
-        return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[l.platform] || ICONS.website}<span>${escapeHtml(PLATFORMS.find(p=>p.id===l.platform)?.name || 'Link')}</span></a>`;
+        const displayName = l.name && l.name.trim() !== '' ? l.name : (PLATFORMS.find(p=>p.id===l.platform)?.name || 'Link');
+        return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[l.platform] || ICONS.website}<span>${escapeHtml(displayName)}</span></a>`;
       }).join('');
+      
       const userNumHtml = user.userNumber ? `<span class="profile-user-number">User #${user.userNumber}</span>` : '';
-      return `<div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#000000')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 53px)'};"><div class="profile-card">${av}<div class="profile-user-header"><div class="profile-username-row"><span class="profile-username">@${escapeHtml(user.username)}</span><span class="profile-badges-container">${this.getBadgesHtml(user)}</span></div>${userNumHtml}</div><p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p><div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div></div></div>`;
+      
+      const bgStyle = user.bgUrl ? `background-image: url('${escapeHtml(user.bgUrl)}'); background-size: cover; background-position: center;` : `background: ${escapeHtml(user.bgColor || '#000000')};`;
+      
+      const musicHtml = user.musicUrl ? `<audio controls class="music-player" src="${escapeHtml(user.musicUrl)}"></audio>` : '';
+
+      return `<div class="profile-wrapper" style="${bgStyle} min-height: ${isPreview ? '420px' : 'calc(100vh - 53px)'};">
+        <div class="profile-card">
+          ${av}
+          <div class="profile-user-header">
+            <div class="profile-username-row">
+              <span class="profile-username">@${escapeHtml(user.username)}</span>
+              <span class="profile-badges-container">${this.getBadgesHtml(user)}</span>
+            </div>
+            ${userNumHtml}
+          </div>
+          <p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p>
+          <div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div>
+          ${musicHtml}
+        </div>
+      </div>`;
     },
 
     async renderProfileView(username) {
@@ -893,7 +1064,6 @@ const firebaseConfig = {
         snap.forEach(d => { if (!d.data().banned) activeUser = { uid: d.id, ...d.data() }; });
         if (!activeUser) throw new Error('Banned');
         
-        // Dynamically calculate user number if missing (for older accounts)
         if (!activeUser.userNumber) {
           const allUsersSnap = await getDocs(collection(db, 'users'));
           let allUsers = [];
@@ -922,11 +1092,8 @@ const firebaseConfig = {
         let allUsers = [];
         snap.forEach(d => allUsers.push({ uid: d.id, ...d.data() }));
         
-        // Sort by creation date and assign user number dynamically to ensure all old accounts get one
         allUsers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-        allUsers.forEach((u, index) => {
-          if (!u.userNumber) u.userNumber = index + 1;
-        });
+        allUsers.forEach((u, index) => { if (!u.userNumber) u.userNumber = index + 1; });
 
         let activeUsers = [];
         let bannedUsers = [];
@@ -982,7 +1149,6 @@ const firebaseConfig = {
             const uid = btn.dataset.uid;
             const action = btn.dataset.action;
             const targetDoc = doc(db, 'users', uid);
-            
             if (action === 'ban') {
               await updateDoc(targetDoc, { banned: true });
               toast('User banned.', 'success');
@@ -1065,7 +1231,6 @@ const firebaseConfig = {
 
       if (!newUsername) return toast('Username cannot be empty.', 'error');
 
-      // Check if username is taken by someone else
       const q = query(collection(db, 'users'), where('username', '==', newUsername));
       const snap = await getDocs(q);
       let isAvailable = true;
@@ -1080,10 +1245,7 @@ const firebaseConfig = {
 
       try {
         await updateDoc(doc(db, 'users', this.editTargetUid), {
-          username: newUsername,
-          bio: newBio,
-          avatar: newAvatar,
-          usernameLocked: isLocked
+          username: newUsername, bio: newBio, avatar: newAvatar, usernameLocked: isLocked
         });
         toast('User updated successfully!', 'success');
         $('#edit-user-modal').classList.add('hidden');
@@ -1107,7 +1269,6 @@ const firebaseConfig = {
         await updateDoc(targetDoc, { banned: true, usernameLocked: isLocked });
         toast(`User banned. Username ${isLocked ? 'LOCKED' : 'freed'}.`, 'success');
       }
-      
       $('#edit-user-modal').classList.add('hidden');
       this.renderAdmin();
     }
