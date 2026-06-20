@@ -400,10 +400,11 @@
   appId: "1:263303078432:web:d7de28c471531592bbd245",
   measurementId: "G-00SX8WMLSX"
 };
+
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE
   // =========================================================================
-const EMAILJS_SERVICE_ID = "service_as8k07v";
+  const EMAILJS_SERVICE_ID = "service_as8k07v";
   const EMAILJS_TEMPLATE_ID = "template_y7vfb1m";
   const EMAILJS_PUBLIC_KEY = "OpsG9qFj66J46w0Yn";
   // =========================================================================
@@ -438,10 +439,14 @@ const EMAILJS_SERVICE_ID = "service_as8k07v";
     { name: 'Purple', bg: '#2e0249' }, { name: 'Forest', bg: '#134e5e' }
   ];
   const PLATFORMS = [
-    { id: 'website', name: 'Website' }, { id: 'twitter', name: 'Twitter' }, 
-    { id: 'instagram', name: 'Instagram' }, { id: 'github', name: 'GitHub' }, 
-    { id: 'email', name: 'Email' }, { id: 'discord', name: 'Discord' },
-    { id: 'tiktok', name: 'TikTok' }, { id: 'youtube', name: 'YouTube' }
+    { id: 'website', name: 'Website', placeholder: 'https://yourlink.com' }, 
+    { id: 'twitter', name: 'Twitter', placeholder: 'Enter username only' }, 
+    { id: 'instagram', name: 'Instagram', placeholder: 'Enter username only' }, 
+    { id: 'github', name: 'GitHub', placeholder: 'Enter username only' }, 
+    { id: 'email', name: 'Email', placeholder: 'your@email.com' }, 
+    { id: 'discord', name: 'Discord', placeholder: 'Enter ID only' },
+    { id: 'tiktok', name: 'TikTok', placeholder: 'Enter username only' }, 
+    { id: 'youtube', name: 'YouTube', placeholder: 'Enter @handle only' }
   ];
   const ICONS = {
     twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
@@ -945,18 +950,31 @@ const EMAILJS_SERVICE_ID = "service_as8k07v";
       row.className = 'link-row';
       row.innerHTML = `
         <select class="link-platform">${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</select>
-        <input type="text" class="link-name" placeholder="Custom Name (Optional)">
+        <input type="text" class="link-name" placeholder="Custom Name">
         <input type="text" class="link-url" placeholder="URL or username">
         <button type="button" class="remove-link">×</button>
       `;
       $('#links-container').appendChild(row);
+      
+      const platformSelect = row.querySelector('.link-platform');
+      const urlInput = row.querySelector('.link-url');
+
+      const updatePlaceholder = () => {
+        const p = PLATFORMS.find(x => x.id === platformSelect.value);
+        urlInput.placeholder = p ? p.placeholder : 'URL or username';
+      };
+
+      platformSelect.addEventListener('change', () => { updatePlaceholder(); this.updatePreview(); });
+      updatePlaceholder();
+
       if (data) {
-        row.querySelector('.link-platform').value = data.platform;
+        platformSelect.value = data.platform;
+        urlInput.value = data.url;
         row.querySelector('.link-name').value = data.name || '';
-        row.querySelector('.link-url').value = data.url;
+        updatePlaceholder();
       }
       row.querySelector('.remove-link').addEventListener('click', () => { row.remove(); this.updatePreview(); });
-      row.querySelector('.link-url').addEventListener('input', () => this.updatePreview());
+      urlInput.addEventListener('input', () => this.updatePreview());
       row.querySelector('.link-name').addEventListener('input', () => this.updatePreview());
     },
 
@@ -1026,11 +1044,34 @@ const EMAILJS_SERVICE_ID = "service_as8k07v";
       const av = user.avatar ? `<img src="${escapeHtml(user.avatar)}" class="profile-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"><div class="profile-avatar-placeholder" style="display:none;">${escapeHtml(user.username.charAt(0))}</div>` : `<div class="profile-avatar-placeholder">${escapeHtml(user.username.charAt(0))}</div>`;
       
       const links = (user.links || []).map(l => {
-        let href = l.url;
-        if (l.platform === 'email') href = 'mailto:' + l.url;
-        else if (!l.url.startsWith('http')) href = 'https://' + l.url;
-        const displayName = l.name && l.name.trim() !== '' ? l.name : (PLATFORMS.find(p=>p.id===l.platform)?.name || 'Link');
-        return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[l.platform] || ICONS.website}<span>${escapeHtml(displayName)}</span></a>`;
+        const platform = l.platform;
+        let href = l.url || '';
+        
+        // Smart Link Builder: If it's already a URL, keep it. Otherwise, build it.
+        if (!href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('mailto:')) {
+          if (platform === 'email') {
+            href = 'mailto:' + href;
+          } else if (platform === 'website') {
+            href = 'https://' + href;
+          } else if (platform === 'twitter') {
+            href = 'https://twitter.com/' + href.replace('@', '');
+          } else if (platform === 'instagram') {
+            href = 'https://instagram.com/' + href.replace('@', '');
+          } else if (platform === 'github') {
+            href = 'https://github.com/' + href.replace('@', '');
+          } else if (platform === 'discord') {
+            href = 'https://discord.com/users/' + href.replace('@', '');
+          } else if (platform === 'tiktok') {
+            href = 'https://tiktok.com/@' + href.replace('@', '');
+          } else if (platform === 'youtube') {
+            href = 'https://youtube.com/@' + href.replace('@', '');
+          } else {
+            href = 'https://' + href;
+          }
+        }
+        
+        const displayName = l.name && l.name.trim() !== '' ? l.name : (PLATFORMS.find(p=>p.id===platform)?.name || 'Link');
+        return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[platform] || ICONS.website}<span>${escapeHtml(displayName)}</span></a>`;
       }).join('');
       
       const userNumHtml = user.userNumber ? `<span class="profile-user-number">User #${user.userNumber}</span>` : '';
