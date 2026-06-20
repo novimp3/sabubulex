@@ -40,8 +40,6 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
-  
-  /* Prevent input zoom on mobile */
   input, select, textarea { font-size: 16px !important; }
 
   nav { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
@@ -100,12 +98,10 @@
   .header-actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
   .share-url { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; color: var(--text-dim); font-size: 12px; font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* Profile View */
   .profile-wrapper { min-height: calc(100vh - 53px); display: flex; align-items: center; justify-content: center; padding: 24px 16px; background-size: cover; background-position: center; }
   .profile-card { width: 100%; max-width: 480px; text-align: center; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 32px 24px; }
   .profile-avatar { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; display: block; border: 2px solid rgba(255,255,255,0.1); }
   .profile-avatar-placeholder { width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 16px; background: var(--surface-2); border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
-  
   .profile-user-header { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 12px; }
   .profile-username-row { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
   .profile-username { font-size: 20px; font-weight: 600; color: var(--text); }
@@ -113,17 +109,28 @@
   .profile-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; }
   .profile-badge svg { width: 12px; height: 12px; }
   .profile-user-number { font-size: 12px; color: var(--text-mute); font-family: 'JetBrains Mono', monospace; }
-  
   .profile-bio { color: var(--text-dim); font-size: 14px; margin: 0 0 24px; }
   .profile-links { display: flex; flex-direction: column; gap: 8px; }
   .profile-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text); text-decoration: none; font-weight: 500; font-size: 14px; }
   .profile-link:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
   .profile-link svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
-  
   .banned-screen { text-align: center; padding: 48px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
   .not-found { text-align: center; padding: 64px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
 
-  /* Admin */
+  /* Admin UI Overhaul */
+  .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-card .num { font-size: 24px; font-weight: 700; color: var(--text); }
+  .stat-card .label { font-size: 11px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 4px; }
+  .stat-banned .num { color: var(--danger); }
+  .stat-banned { border-color: rgba(248,113,113,0.2); }
+  .stat-verified .num { color: var(--info); }
+  .stat-verified { border-color: rgba(96,165,250,0.2); }
+  
+  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .admin-tab { padding: 10px 16px; background: transparent; border: none; color: var(--text-mute); font-weight: 500; font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; }
+  .admin-tab.active { color: var(--text); border-bottom-color: var(--text); }
+
   .users-table { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .user-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr auto; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--border); align-items: center; }
   .user-row:last-child { border-bottom: none; }
@@ -134,10 +141,8 @@
   .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid; font-family: 'JetBrains Mono', monospace; }
   .badge-admin { color: var(--text); border-color: var(--text); }
   .badge-verified { color: var(--info); border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.1); }
-  .badge-premium { color: var(--gold); border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.1); }
   .badge-banned { color: var(--danger); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.1); }
 
-  /* Modals & Toasts */
   #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
   .toast { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; color: var(--text); font-size: 13px; animation: slideIn .2s ease; pointer-events: auto; display: flex; align-items: center; gap: 10px; min-width: 220px; max-width: 320px; font-family: 'JetBrains Mono', monospace; }
   .toast.success { border-color: var(--success); color: var(--success); }
@@ -145,14 +150,14 @@
   @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
   .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn .2s ease; }
-  .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; width: 100%; }
+  .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; width: 100%; max-height: 90vh; overflow-y: auto; }
   .modal-card h3 { font-size: 16px; margin-bottom: 8px; font-weight: 600; }
   .modal-card p { color: var(--text-dim); margin-bottom: 20px; font-size: 13px; }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
   .badge-select-list { display: grid; gap: 10px; margin: 16px 0; }
   .badge-select-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: all .15s; }
   .badge-select-item:hover { background: var(--surface-2); }
-  
+
   /* MOBILE RESPONSIVE FIXES */
   @media (max-width: 768px) {
     .nav-inner { padding: 12px 16px; }
@@ -163,19 +168,13 @@
     .link-row { grid-template-columns: 100px 1fr auto; }
     .header-actions { flex-direction: column; align-items: stretch; }
     .header-actions .btn, .header-actions .share-url { width: 100%; text-align: center; }
-    
-    /* Admin Table Fixes */
+    .admin-grid { grid-template-columns: repeat(2, 1fr); }
     .users-table { border-radius: 8px; }
-    .user-row { 
-      grid-template-columns: 1fr; 
-      gap: 12px; 
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-    }
+    .user-row { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
     .user-row > div { width: 100%; }
     .user-actions { display: flex; flex-wrap: wrap; gap: 6px; }
     .user-actions .btn { flex: 1; min-width: 70px; }
-    .user-meta { display: none; } /* Hide stats on mobile to save space */
+    .user-meta { display: none; }
   }
 </style>
 </head>
@@ -199,30 +198,19 @@
         <button class="tab active" data-tab="login">Login</button>
         <button class="tab" data-tab="register">Register</button>
       </div>
-      
       <form id="login-form">
         <div class="form-group"><label>Username or Email</label><input type="text" id="login-identifier" required></div>
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" id="login-password" required>
-        </div>
-        <div class="form-footer">
-          <button type="button" class="link-btn" id="forgot-password-btn">Forgot password?</button>
-        </div>
+        <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+        <div class="form-footer"><button type="button" class="link-btn" id="forgot-password-btn">Forgot password?</button></div>
         <button type="submit" class="btn btn-block">Login</button>
       </form>
-
       <form id="twofa-form" class="hidden">
         <h3 style="font-size: 16px; margin-bottom: 8px; font-weight: 600;">2-Step Verification</h3>
         <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 16px;">Enter the 6-digit code sent to your email.</p>
-        <div class="form-group">
-          <label>6-Digit Code</label>
-          <input type="text" id="twofa-code-input" maxlength="6" required style="text-align: center; font-family: monospace; letter-spacing: 4px;">
-        </div>
+        <div class="form-group"><label>6-Digit Code</label><input type="text" id="twofa-code-input" maxlength="6" required style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div>
         <button type="submit" class="btn btn-block">Verify & Login</button>
         <button type="button" id="cancel-2fa-btn" class="link-btn" style="margin-top: 16px; width: 100%; text-align: center;">Cancel</button>
       </form>
-
       <form id="register-form" class="hidden">
         <div class="form-group"><label>Email (Optional)</label><input type="email" id="register-email" placeholder="For password resets"></div>
         <div class="form-group"><label>Username</label><input type="text" id="register-username" required pattern="[a-zA-Z0-9_]{3,20}"></div>
@@ -239,7 +227,6 @@
         <div class="share-url" id="share-url"></div>
         <button class="btn btn-ghost btn-sm" id="copy-share-btn">Copy Link</button>
       </div>
-      
       <div class="dash-grid">
         <div>
           <div class="dash-card">
@@ -255,12 +242,9 @@
               <div class="section-title">Social Links</div>
               <div id="links-container"></div>
               <button type="button" class="btn btn-ghost btn-sm" id="add-link-btn">+ Add Link</button>
-              <div style="margin-top: 24px; display: flex; gap: 8px;">
-                <button type="submit" class="btn">Save Profile</button>
-              </div>
+              <div style="margin-top: 24px; display: flex; gap: 8px;"><button type="submit" class="btn">Save Profile</button></div>
             </form>
           </div>
-
           <div class="dash-card">
             <h2>Account Security</h2>
             <p class="hint">// add email for password resets & 2FA</p>
@@ -277,7 +261,6 @@
             </div>
           </div>
         </div>
-
         <div class="dash-card">
           <h2>Live Preview</h2>
           <p class="hint">// real-time view</p>
@@ -288,15 +271,20 @@
   </section>
 
   <section id="view-profile" class="view hidden"><div id="profile-content"></div></section>
+  
   <section id="view-admin" class="view hidden">
     <div class="container">
-      <div class="header-actions" style="margin-bottom: 20px;">
-        <h2 style="font-size: 18px; font-weight: 600; margin: 0;">Admin Panel</h2>
-        <div id="admin-stats" style="display: flex; gap: 8px;"></div>
+      <div class="admin-grid">
+        <div class="stat-card"><div class="num" id="stat-total">0</div><div class="label">Total</div></div>
+        <div class="stat-card"><div class="num" id="stat-active">0</div><div class="label">Active</div></div>
+        <div class="stat-card stat-verified"><div class="num" id="stat-verified">0</div><div class="label">Verified</div></div>
+        <div class="stat-card stat-banned"><div class="num" id="stat-banned">0</div><div class="label">Banned</div></div>
       </div>
-      <div class="users-table">
-        <div id="admin-users"></div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-admin-tab="active">Active Users</button>
+        <button class="admin-tab" data-admin-tab="banned">Banned Users</button>
       </div>
+      <div class="users-table"><div id="admin-users"></div></div>
     </div>
   </section>
 
@@ -305,9 +293,7 @@
     <div class="modal-card">
       <h3>Reset Password</h3>
       <p>Enter your account email and we'll send you a link to reset your password.</p>
-      <div class="form-group" style="margin-bottom: 0;">
-        <input type="email" id="reset-email-input" placeholder="your@email.com" style="background: var(--bg);">
-      </div>
+      <div class="form-group" style="margin-bottom: 0;"><input type="email" id="reset-email-input" placeholder="your@email.com" style="background: var(--bg);"></div>
       <div class="modal-actions">
         <button class="btn btn-ghost btn-sm" id="reset-cancel">Cancel</button>
         <button class="btn btn-sm" id="reset-submit">Send Reset Link</button>
@@ -323,6 +309,25 @@
       <div class="modal-actions">
         <button class="btn btn-ghost btn-sm" id="badge-cancel">Cancel</button>
         <button class="btn btn-sm" id="badge-save">Save Badges</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="edit-user-modal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Edit User: <span id="edit-user-displayname" style="color: var(--info);"></span></h3>
+      <p>Modify the user's profile details. You can bypass length limits.</p>
+      <div class="form-group"><label>Username</label><input type="text" id="edit-username" style="background: var(--bg);"></div>
+      <div class="form-group"><label>Bio</label><textarea id="edit-bio" style="background: var(--bg);"></textarea></div>
+      <div class="form-group"><label>Avatar URL</label><input type="url" id="edit-avatar" style="background: var(--bg);"></div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <input type="checkbox" id="edit-locked" style="width: 20px; height: 20px; accent-color: var(--danger);">
+        <label for="edit-locked" style="text-transform: none; margin: 0; font-size: 13px; color: var(--text);">Lock Username (Make unusable by others)</label>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="edit-cancel">Cancel</button>
+        <button class="btn btn-danger btn-sm" id="edit-ban-btn">Ban User</button>
+        <button class="btn btn-sm" id="edit-save">Save Changes</button>
       </div>
     </div>
   </div>
@@ -344,6 +349,7 @@
   appId: "1:263303078432:web:d7de28c471531592bbd245",
   measurementId: "G-00SX8WMLSX"
 };
+
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE
   // =========================================================================
@@ -370,17 +376,8 @@
   }
 
   async function sendVerificationEmail(email, code) {
-    const data = {
-      service_id: EMAILJS_SERVICE_ID,
-      template_id: EMAILJS_TEMPLATE_ID,
-      user_id: EMAILJS_PUBLIC_KEY,
-      template_params: { to_email: email, code: code }
-    };
-    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
+    const data = { service_id: EMAILJS_SERVICE_ID, template_id: EMAILJS_TEMPLATE_ID, user_id: EMAILJS_PUBLIC_KEY, template_params: { to_email: email, code: code } };
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
     if (!res.ok) throw new Error('Failed to send email');
     return true;
   }
@@ -403,7 +400,6 @@
     email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>'
   };
 
-  // Badge Configuration
   const BADGES = {
     verified: { name: 'Verified', color: '#60a5fa', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' },
     premium: { name: 'Premium', color: '#fbbf24', svg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>' },
@@ -417,6 +413,8 @@
     currentUser: null,
     tempLoginData: null,
     badgeTargetUid: null,
+    editTargetUid: null,
+    adminTab: 'active',
 
     init() {
       this.bindEvents();
@@ -467,6 +465,10 @@
       $('#badge-cancel').addEventListener('click', () => $('#badge-modal').classList.add('hidden'));
       $('#badge-save').addEventListener('click', () => this.handleSaveBadges());
 
+      $('#edit-cancel').addEventListener('click', () => $('#edit-user-modal').classList.add('hidden'));
+      $('#edit-save').addEventListener('click', () => this.handleAdminSaveUser());
+      $('#edit-ban-btn').addEventListener('click', () => this.handleAdminBanUser());
+
       ['profile-avatar', 'profile-bio'].forEach(id => $('#' + id).addEventListener('input', () => this.updatePreview()));
       $('#profile-bgcolor').addEventListener('input', () => {
         $$('.preset.active').forEach(p => p.classList.remove('active'));
@@ -485,6 +487,14 @@
         if (e.target.id === 'send-code-btn') this.handleSendCode();
         if (e.target.id === 'verify-code-btn') this.handleVerifyCode();
         if (e.target.id === 'toggle-2fa-btn') this.handleToggle2FA();
+        
+        // Admin Tabs
+        if (e.target.classList.contains('admin-tab')) {
+          $$('.admin-tab').forEach(t => t.classList.remove('active'));
+          e.target.classList.add('active');
+          this.adminTab = e.target.dataset.adminTab;
+          this.renderAdmin();
+        }
       });
     },
 
@@ -568,16 +578,28 @@
       const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}@novi.local`;
 
       try {
+        // Check if username is taken or locked
         const q = query(collection(db, 'users'), where('username', '==', username));
         const snap = await getDocs(q);
-        if (!snap.empty) return toast('Username already taken.', 'error');
+        if (!snap.empty) {
+          let isAvailable = true;
+          snap.forEach(doc => {
+            const u = doc.data();
+            // If user is active, OR user is banned but username is locked
+            if (!u.banned || u.usernameLocked) {
+              isAvailable = false;
+            }
+          });
+          if (!isAvailable) return toast('Username already taken or locked.', 'error');
+        }
 
         const cred = await createUserWithEmailAndPassword(auth, emailToUse, password);
         const isAdmin = username === 'novi';
         
-        // Get total users to assign User Number
         const allUsersSnap = await getDocs(collection(db, 'users'));
-        const userNumber = allUsersSnap.size + 1;
+        let maxNum = 0;
+        allUsersSnap.forEach(d => { if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; });
+        const userNumber = maxNum + 1;
         
         await setDoc(doc(db, 'users', cred.user.uid), {
           username: username, 
@@ -585,6 +607,7 @@
           emailVerified: false, 
           twoFactorEnabled: false,
           userNumber: userNumber,
+          usernameLocked: false,
           badges: isAdmin ? ['verified', 'founder'] : [],
           avatar: '', bio: '', bgColor: '#000000', bgPreset: null, links: [],
           banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now()
@@ -619,11 +642,16 @@
         const snap = await getDocs(q);
         if (snap.empty) return toast('User not found.', 'error');
         
-        userDocId = snap.docs[0].id;
-        userData = snap.docs[0].data();
+        // Find the active account if there are multiple (banned ones)
+        let activeDoc = null;
+        snap.forEach(d => {
+          if (!d.data().banned) activeDoc = d;
+        });
+        if (!activeDoc) return toast('This account has been banned.', 'error');
+        
+        userDocId = activeDoc.id;
+        userData = activeDoc.data();
         emailToLogin = userData.email;
-
-        if (userData.banned) return toast('This account has been banned.', 'error');
 
         if (userData.twoFactorEnabled) {
           const code = Math.floor(100000 + Math.random() * 900000).toString();
@@ -706,32 +734,21 @@
       if (user.pendingEmail) {
         twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-pending">PENDING VERIFICATION: ${escapeHtml(user.pendingEmail)}</div>`;
-        area.innerHTML = `
-          <div class="form-group"><label>Enter 6-Digit Code</label><input type="text" id="code-input" maxlength="6" placeholder="123456" style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div>
-          <button id="verify-code-btn" class="btn btn-block">Verify Email</button>
-        `;
+        area.innerHTML = `<div class="form-group"><label>Enter 6-Digit Code</label><input type="text" id="code-input" maxlength="6" placeholder="123456" style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div><button id="verify-code-btn" class="btn btn-block">Verify Email</button>`;
       } else if (isFakeEmail) {
         twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-none">NO EMAIL ADDED</div>`;
-        area.innerHTML = `
-          <div class="form-group"><label>Add Email Address</label><input type="email" id="new-email-input" placeholder="your@email.com"></div>
-          <button id="send-code-btn" class="btn btn-block">Send Verification Code</button>
-        `;
+        area.innerHTML = `<div class="form-group"><label>Add Email Address</label><input type="email" id="new-email-input" placeholder="your@email.com"></div><button id="send-code-btn" class="btn btn-block">Send Verification Code</button>`;
       } else if (user.emailVerified) {
         twofaArea.classList.remove('hidden');
         statusBox.innerHTML = `<div class="status-box status-verified">VERIFIED: ${escapeHtml(user.email)}</div>`;
-        area.innerHTML = `
-          <div class="form-group"><label>Change Email Address</label><input type="email" id="new-email-input" placeholder="new@email.com"></div>
-          <button id="send-code-btn" class="btn btn-ghost btn-block">Send Verification Code</button>
-        `;
+        area.innerHTML = `<div class="form-group"><label>Change Email Address</label><input type="email" id="new-email-input" placeholder="new@email.com"></div><button id="send-code-btn" class="btn btn-ghost btn-block">Send Verification Code</button>`;
         $('#toggle-2fa-btn').textContent = user.twoFactorEnabled ? 'Turn Off' : 'Turn On';
         $('#toggle-2fa-btn').className = `btn btn-sm ${user.twoFactorEnabled ? 'btn-danger' : 'btn-success'}`;
       } else {
         twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-pending">UNVERIFIED: ${escapeHtml(user.email)}</div>`;
-        area.innerHTML = `
-          <button id="send-code-btn" class="btn btn-block">Send Verification Code to ${escapeHtml(user.email)}</button>
-        `;
+        area.innerHTML = `<button id="send-code-btn" class="btn btn-block">Send Verification Code to ${escapeHtml(user.email)}</button>`;
       }
     },
 
@@ -754,21 +771,14 @@
       const newEmail = input && input.value.trim() ? input.value.trim() : this.currentUser.email;
       
       if (!newEmail || !newEmail.includes('@')) return toast('Please enter a valid email.', 'error');
-
       const code = Math.floor(100000 + Math.random() * 900000).toString();
 
       try {
-        await updateDoc(doc(db, 'users', this.currentUser.uid), {
-          pendingEmail: newEmail,
-          verificationCode: code
-        });
-        
+        await updateDoc(doc(db, 'users', this.currentUser.uid), { pendingEmail: newEmail, verificationCode: code });
         this.currentUser.pendingEmail = newEmail;
         this.currentUser.verificationCode = code;
-
         await sendVerificationEmail(newEmail, code);
         toast('Verification code sent to your email!', 'success');
-        
         this.renderEmailSection(this.currentUser);
       } catch (err) {
         toast('Failed to send code.', 'error');
@@ -778,19 +788,12 @@
     async handleVerifyCode() {
       if (!this.currentUser) return;
       const enteredCode = $('#code-input').value.trim();
-      
-      if (enteredCode !== this.currentUser.verificationCode) {
-        return toast('Invalid verification code.', 'error');
-      }
+      if (enteredCode !== this.currentUser.verificationCode) return toast('Invalid verification code.', 'error');
 
       try {
         await updateEmail(auth.currentUser, this.currentUser.pendingEmail);
-        
-        // Auto-grant verified badge when email is verified
         const currentBadges = this.currentUser.badges || [];
-        if (!currentBadges.includes('verified')) {
-          currentBadges.push('verified');
-        }
+        if (!currentBadges.includes('verified')) currentBadges.push('verified');
         
         await updateDoc(doc(db, 'users', this.currentUser.uid), {
           email: this.currentUser.pendingEmail,
@@ -808,7 +811,7 @@
         delete this.currentUser.pendingEmail;
         delete this.currentUser.verificationCode;
 
-        toast('Email verified! You automatically earned the Verified badge.', 'success');
+        toast('Email verified! You earned the Verified badge.', 'success');
         this.renderEmailSection(this.currentUser);
         this.updatePreview();
       } catch (err) {
@@ -841,7 +844,6 @@
       if (!this.currentUser) return;
       const { bgPreset, bgColor } = this.getFormBackground();
       const data = { avatar: $('#profile-avatar').value.trim(), bio: $('#profile-bio').value.trim(), bgColor, bgPreset, links: this.getFormLinks() };
-      
       try {
         await updateDoc(doc(db, 'users', this.currentUser.uid), data);
         this.currentUser = { ...this.currentUser, ...data };
@@ -855,9 +857,7 @@
     getBadgesHtml(user) {
       const badges = user.badges || (user.verified ? ['verified'] : []);
       return badges.map(b => {
-        if (BADGES[b]) {
-          return `<span class="profile-badge" style="background: ${BADGES[b].color}" title="${BADGES[b].name}">${BADGES[b].svg}</span>`;
-        }
+        if (BADGES[b]) return `<span class="profile-badge" style="background: ${BADGES[b].color}" title="${BADGES[b].name}">${BADGES[b].svg}</span>`;
         return '';
       }).join('');
     },
@@ -876,23 +876,8 @@
         else if (!l.url.startsWith('http')) href = 'https://' + l.url;
         return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[l.platform] || ICONS.website}<span>${escapeHtml(PLATFORMS.find(p=>p.id===l.platform)?.name || 'Link')}</span></a>`;
       }).join('');
-      
       const userNumHtml = user.userNumber ? `<span class="profile-user-number">User #${user.userNumber}</span>` : '';
-      
-      return `<div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#000000')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 53px)'};">
-        <div class="profile-card">
-          ${av}
-          <div class="profile-user-header">
-            <div class="profile-username-row">
-              <span class="profile-username">@${escapeHtml(user.username)}</span>
-              <span class="profile-badges-container">${this.getBadgesHtml(user)}</span>
-            </div>
-            ${userNumHtml}
-          </div>
-          <p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p>
-          <div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div>
-        </div>
-      </div>`;
+      return `<div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#000000')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 53px)'};"><div class="profile-card">${av}<div class="profile-user-header"><div class="profile-username-row"><span class="profile-username">@${escapeHtml(user.username)}</span><span class="profile-badges-container">${this.getBadgesHtml(user)}</span></div>${userNumHtml}</div><p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p><div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div></div></div>`;
     },
 
     async renderProfileView(username) {
@@ -902,17 +887,19 @@
         const snap = await getDocs(q);
         if (snap.empty) throw new Error('Not found');
         
-        const user = { uid: snap.docs[0].id, ...snap.docs[0].data() };
+        let activeUser = null;
+        snap.forEach(d => { if (!d.data().banned) activeUser = { uid: d.id, ...d.data() }; });
+        if (!activeUser) throw new Error('Banned');
         
-        if (user.banned) {
-          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`;
-        } else {
-          content.innerHTML = this.profileHtml(user);
-        }
+        content.innerHTML = this.profileHtml(activeUser);
         $('#view-profile').classList.remove('hidden');
         if (this.currentUser) this.renderNav(this.currentUser);
       } catch (err) {
-        content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`;
+        if (err.message === 'Banned') {
+          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`;
+        } else {
+          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`;
+        }
         $('#view-profile').classList.remove('hidden');
       }
     },
@@ -920,16 +907,35 @@
     async renderAdmin() {
       try {
         const snap = await getDocs(collection(db, 'users'));
-        let html = '';
-        let stats = { total: 0, verified: 0, banned: 0 };
+        let activeUsers = [];
+        let bannedUsers = [];
+        let stats = { total: 0, active: 0, verified: 0, banned: 0 };
         
         snap.forEach(d => {
+          const u = { uid: d.id, ...d.data() };
           stats.total++;
-          const u = d.data();
           const userBadges = u.badges || (u.verified ? ['verified'] : []);
           if (userBadges.includes('verified')) stats.verified++;
-          if (u.banned) stats.banned++;
-          const uid = d.id;
+          
+          if (u.banned) {
+            stats.banned++;
+            bannedUsers.push(u);
+          } else {
+            stats.active++;
+            activeUsers.push(u);
+          }
+        });
+
+        $('#stat-total').textContent = stats.total;
+        $('#stat-active').textContent = stats.active;
+        $('#stat-verified').textContent = stats.verified;
+        $('#stat-banned').textContent = stats.banned;
+
+        const usersToRender = this.adminTab === 'active' ? activeUsers : bannedUsers;
+        let html = '';
+
+        usersToRender.forEach(u => {
+          const uid = u.uid;
           const av = u.avatar ? `background-image: url('${escapeHtml(u.avatar)}')` : '';
           const displayEmail = u.email && !u.email.endsWith('@novi.local') ? escapeHtml(u.email) : 'No email';
           const userNum = u.userNumber ? `#${u.userNumber}` : '#?';
@@ -944,26 +950,17 @@
             </div>
             <div class="user-meta">${(u.links || []).length} links</div>
             <div class="user-actions">
+              ${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''}
+              <button class="btn btn-sm btn-ghost" data-action="edit" data-uid="${uid}">Edit</button>
+              <button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}">Badges</button>
               ${u.role !== 'admin' ? `
-                <button class="btn btn-sm btn-ghost" data-action="promote" data-uid="${uid}">Make Admin</button>
-                <button class="btn btn-sm ${u.banned ? 'btn-success' : 'btn-danger'}" data-action="ban" data-uid="${uid}">${u.banned ? 'Unban' : 'Ban'}</button>
-                <button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}" data-username="${escapeHtml(u.username)}">Badges</button>
-              ` : `
-                <span class="badge badge-admin">Admin</span>
-                ${uid !== this.currentUser.uid ? `<button class="btn btn-sm btn-ghost" data-action="demote" data-uid="${uid}">Remove Admin</button>` : ''}
-                <button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}" data-username="${escapeHtml(u.username)}">Badges</button>
-              `}
+                ${this.adminTab === 'active' ? `<button class="btn btn-sm btn-danger" data-action="ban" data-uid="${uid}">Ban</button>` : `<button class="btn btn-sm btn-success" data-action="unban" data-uid="${uid}">Unban</button>`}
+              ` : ''}
             </div>
           </div>`;
         });
-        
-        $('#admin-stats').innerHTML = `
-          <div class="stat-card"><div class="num">${stats.total}</div><div class="label">Total</div></div>
-          <div class="stat-card"><div class="num">${stats.verified}</div><div class="label">Verified</div></div>
-          <div class="stat-card"><div class="num">${stats.banned}</div><div class="label">Banned</div></div>
-        `;
-        
-        $('#admin-users').innerHTML = html || '<p style="padding: 24px; color: var(--text-mute); text-align:center; font-family: monospace;">// no users found</p>';
+
+        $('#admin-users').innerHTML = html || `<p style="padding: 24px; color: var(--text-mute); text-align:center; font-family: monospace;">// no users found</p>`;
 
         $$('#admin-users [data-action]').forEach(btn => {
           btn.addEventListener('click', async () => {
@@ -972,21 +969,17 @@
             const targetDoc = doc(db, 'users', uid);
             
             if (action === 'ban') {
-              const snap = await getDoc(targetDoc);
-              const isBanned = snap.data().banned;
-              await updateDoc(targetDoc, { banned: !isBanned });
-              toast(`User ${isBanned ? 'unbanned' : 'banned'}.`, 'success');
+              await updateDoc(targetDoc, { banned: true });
+              toast('User banned.', 'success');
               this.renderAdmin();
-            } else if (action === 'promote') {
-              await updateDoc(targetDoc, { role: 'admin' });
-              toast('User promoted to Admin.', 'success');
-              this.renderAdmin();
-            } else if (action === 'demote') {
-              await updateDoc(targetDoc, { role: 'user' });
-              toast('Admin demoted to User.', 'success');
+            } else if (action === 'unban') {
+              await updateDoc(targetDoc, { banned: false, usernameLocked: false });
+              toast('User unbanned.', 'success');
               this.renderAdmin();
             } else if (action === 'badges') {
-              this.openBadgeModal(uid, btn.dataset.username);
+              this.openBadgeModal(uid);
+            } else if (action === 'edit') {
+              this.openEditModal(uid);
             }
           });
         });
@@ -995,7 +988,7 @@
       }
     },
 
-    async openBadgeModal(uid, username) {
+    async openBadgeModal(uid) {
       this.badgeTargetUid = uid;
       const snap = await getDoc(doc(db, 'users', uid));
       const currentBadges = snap.data().badges || (snap.data().verified ? ['verified'] : []);
@@ -1014,10 +1007,7 @@
       if (!this.badgeTargetUid) return;
       const selected = $$('.badge-check:checked').map(c => c.value);
       try {
-        await updateDoc(doc(db, 'users', this.badgeTargetUid), { 
-          badges: selected, 
-          verified: selected.includes('verified') 
-        });
+        await updateDoc(doc(db, 'users', this.badgeTargetUid), { badges: selected, verified: selected.includes('verified') });
         toast('Badges updated successfully!', 'success');
         $('#badge-modal').classList.add('hidden');
         this.badgeTargetUid = null;
@@ -1025,6 +1015,78 @@
       } catch (err) {
         toast('Failed to update badges.', 'error');
       }
+    },
+
+    async openEditModal(uid) {
+      this.editTargetUid = uid;
+      const snap = await getDoc(doc(db, 'users', uid));
+      const u = snap.data();
+      
+      $('#edit-user-displayname').textContent = `@${u.username}`;
+      $('#edit-username').value = u.username;
+      $('#edit-bio').value = u.bio || '';
+      $('#edit-avatar').value = u.avatar || '';
+      $('#edit-locked').checked = u.usernameLocked || false;
+      $('#edit-ban-btn').textContent = u.banned ? 'Unban User' : 'Ban User';
+      $('#edit-ban-btn').className = `btn btn-sm ${u.banned ? 'btn-success' : 'btn-danger'}`;
+      
+      $('#edit-user-modal').classList.remove('hidden');
+    },
+
+    async handleAdminSaveUser() {
+      if (!this.editTargetUid) return;
+      const newUsername = $('#edit-username').value.trim().toLowerCase();
+      const newBio = $('#edit-bio').value.trim();
+      const newAvatar = $('#edit-avatar').value.trim();
+      const isLocked = $('#edit-locked').checked;
+
+      if (!newUsername) return toast('Username cannot be empty.', 'error');
+
+      // Check if username is taken by someone else
+      const q = query(collection(db, 'users'), where('username', '==', newUsername));
+      const snap = await getDocs(q);
+      let isAvailable = true;
+      snap.forEach(d => {
+        if (d.id !== this.editTargetUid) {
+          const u = d.data();
+          if (!u.banned || u.usernameLocked) isAvailable = false;
+        }
+      });
+
+      if (!isAvailable) return toast('Username is already taken or locked by another user.', 'error');
+
+      try {
+        await updateDoc(doc(db, 'users', this.editTargetUid), {
+          username: newUsername,
+          bio: newBio,
+          avatar: newAvatar,
+          usernameLocked: isLocked
+        });
+        toast('User updated successfully!', 'success');
+        $('#edit-user-modal').classList.add('hidden');
+        this.renderAdmin();
+      } catch (err) {
+        toast('Failed to update user.', 'error');
+      }
+    },
+
+    async handleAdminBanUser() {
+      if (!this.editTargetUid) return;
+      const targetDoc = doc(db, 'users', this.editTargetUid);
+      const snap = await getDoc(targetDoc);
+      const isBanned = snap.data().banned;
+      const isLocked = $('#edit-locked').checked;
+
+      if (isBanned) {
+        await updateDoc(targetDoc, { banned: false, usernameLocked: false });
+        toast('User unbanned.', 'success');
+      } else {
+        await updateDoc(targetDoc, { banned: true, usernameLocked: isLocked });
+        toast(`User banned. Username ${isLocked ? 'LOCKED' : 'freed'}.`, 'success');
+      }
+      
+      $('#edit-user-modal').classList.add('hidden');
+      this.renderAdmin();
     }
   };
 
