@@ -5,116 +5,152 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>novi.bio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #07070b; --bg2: #0e0e16; --surface: rgba(255,255,255,0.04); --surface-2: rgba(255,255,255,0.07); --border: rgba(255,255,255,0.09); --text: #f5f5fa; --text-dim: #9090a8; --text-mute: #5a5a70; --accent: #8b5cf6; --accent2: #ec4899; --success: #10b981; --danger: #ef4444; --info: #3b82f6; }
+  :root {
+    --bg: #000000; --surface: #0a0a0a; --surface-2: #111111;
+    --border: #1f1f1f; --border-hover: #333333;
+    --text: #f5f5f7; --text-dim: #86868b; --text-mute: #5a5a5f;
+    --accent: #ffffff; --accent-text: #000000;
+    --success: #34d399; --danger: #f87171; --info: #60a5fa;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-  .bg-effects { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
-  .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.35; animation: float 22s ease-in-out infinite; }
-  .blob-1 { width: 500px; height: 500px; background: var(--accent); top: -120px; left: -120px; }
-  .blob-2 { width: 420px; height: 420px; background: var(--accent2); bottom: -120px; right: -100px; animation-delay: -7s; }
-  @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(60px,-60px) scale(1.1); } 66% { transform: translate(-40px,40px) scale(0.95); } }
-  nav { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(20px); background: rgba(7,7,11,0.7); border-bottom: 1px solid var(--border); }
-  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .nav-logo { font-weight: 800; font-size: 20px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
-  .nav-links { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .nav-links a, .nav-links button { padding: 8px 14px; border-radius: 9px; color: var(--text-dim); text-decoration: none; font-size: 14px; font-weight: 500; background: transparent; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: all .2s; }
-  .nav-links a:hover, .nav-links button:hover { color: var(--text); background: var(--surface); }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .nav-logo { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 16px; color: var(--text); cursor: pointer; user-select: none; letter-spacing: -0.02em; }
+  .nav-logo span { color: var(--text-mute); }
+  .nav-links { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .nav-links a, .nav-links button { padding: 8px 14px; border-radius: 6px; color: var(--text-dim); text-decoration: none; font-size: 13px; font-weight: 500; background: transparent; border: 1px solid transparent; cursor: pointer; font-family: inherit; transition: all .15s; }
+  .nav-links a:hover, .nav-links button:hover { color: var(--text); background: var(--surface-2); }
   .nav-links a.active { color: var(--text); background: var(--surface-2); border-color: var(--border); }
-  #logout-btn { color: var(--danger); }
-  .view { min-height: calc(100vh - 56px); padding: 32px 24px; animation: fadeIn .4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  #logout-btn { color: var(--danger); } #logout-btn:hover { background: rgba(248,113,113,0.1); }
+  .view { min-height: calc(100vh - 53px); padding: 48px 24px; animation: fadeIn .3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   .hidden { display: none !important; }
   .container { max-width: 1100px; margin: 0 auto; }
   #view-auth { display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .auth-card { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px 32px; backdrop-filter: blur(20px); }
-  .brand { text-align: center; margin-bottom: 6px; }
-  .brand h1 { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; }
-  .subtitle { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 28px; }
-  .tabs { display: flex; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
-  .tab { flex: 1; padding: 10px; background: transparent; border: none; color: var(--text-dim); font-weight: 600; font-size: 14px; cursor: pointer; border-radius: 8px; transition: all .2s; font-family: inherit; }
-  .tab.active { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+  .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 32px; }
+  .brand { margin-bottom: 24px; }
+  .brand h1 { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; color: var(--text); letter-spacing: -0.02em; }
+  .brand p { color: var(--text-dim); font-size: 13px; margin-top: 4px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .tab { padding: 10px 16px; background: transparent; border: none; color: var(--text-mute); font-weight: 500; font-size: 13px; cursor: pointer; border-bottom: 1px solid transparent; transition: all .15s; font-family: inherit; margin-bottom: -1px; }
+  .tab.active { color: var(--text); border-bottom-color: var(--text); }
   .form-group { margin-bottom: 16px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 6px; }
-  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; font-family: inherit; transition: all .2s; }
-  .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139,92,246,0.12); }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all .2s; font-family: inherit; text-decoration: none; }
-  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.3); }
+  .form-group label { display: block; font-size: 11px; font-weight: 500; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 14px; font-family: inherit; transition: all .15s; }
+  .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--text-dim); }
+  .form-group textarea { resize: vertical; min-height: 80px; font-family: inherit; }
+  .form-footer { display: flex; justify-content: flex-end; margin-top: -8px; margin-bottom: 16px; }
+  .link-btn { background: none; border: none; color: var(--text-dim); font-size: 12px; cursor: pointer; font-family: 'JetBrains Mono', monospace; padding: 0; }
+  .link-btn:hover { color: var(--text); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; background: var(--accent); color: var(--accent-text); border: 1px solid var(--accent); border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all .15s; font-family: inherit; text-decoration: none; }
+  .btn:hover { opacity: 0.9; }
   .btn-block { width: 100%; }
-  .btn-ghost { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
-  .btn-ghost:hover { background: var(--surface-2); }
-  .btn-danger { background: var(--danger); }
-  .btn-success { background: var(--success); }
-  .btn-sm { padding: 7px 12px; font-size: 13px; border-radius: 8px; }
-  .dash-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--surface-2); border-color: var(--border-hover); }
+  .btn-danger { background: var(--danger); border-color: var(--danger); color: #000; }
+  .btn-success { background: var(--success); border-color: var(--success); color: #000; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 4px; }
+  .dash-grid { display: grid; grid-template-columns: 1fr 400px; gap: 24px; }
   @media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
-  .dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; }
-  .dash-card h2 { font-size: 18px; margin-bottom: 4px; }
-  .dash-card .hint { color: var(--text-dim); font-size: 13px; margin-bottom: 20px; }
-  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-mute); margin: 22px 0 10px; }
-  .link-row { display: grid; grid-template-columns: 140px 1fr auto; gap: 8px; margin-bottom: 8px; }
-  .remove-link { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); width: 42px; border-radius: 10px; cursor: pointer; font-size: 18px; }
-  .preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; margin-top: 8px; }
-  .preset { aspect-ratio: 1; border-radius: 10px; cursor: pointer; border: 2px solid transparent; }
-  .preset.active { border-color: white; box-shadow: 0 0 0 2px var(--accent); }
-  .header-actions { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-  .share-url { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; color: var(--text-dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .profile-wrapper { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; background-size: cover; background-position: center; }
-  .profile-card { width: 100%; max-width: 480px; text-align: center; background: rgba(0,0,0,0.55); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 24px; padding: 40px 28px; }
-  .profile-avatar { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; display: block; border: 3px solid var(--border); }
-  .profile-avatar-placeholder { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 16px; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: 700; color: white; }
-  .profile-username { font-size: 22px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
-  .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 50%; color: white; }
-  .verified-badge svg { width: 12px; height: 12px; }
-  .profile-bio { color: var(--text-dim); font-size: 14px; margin: 8px 0 24px; }
-  .profile-links { display: flex; flex-direction: column; gap: 10px; }
-  .profile-link { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 500; font-size: 14px; }
-  .profile-link:hover { background: var(--surface); border-color: var(--accent); transform: translateY(-2px); }
-  .banned-screen { text-align: center; padding: 60px 20px; }
-  .banned-screen h2 { color: var(--danger); margin-bottom: 8px; }
-  .not-found { text-align: center; padding: 80px 20px; }
-  .not-found h2 { font-size: 28px; margin-bottom: 8px; }
+  .dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .dash-card h2 { font-size: 16px; margin-bottom: 4px; font-weight: 600; }
+  .dash-card .hint { color: var(--text-mute); font-size: 12px; margin-bottom: 24px; font-family: 'JetBrains Mono', monospace; }
+  .section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-dim); margin: 24px 0 12px; }
+  .section-title:first-child { margin-top: 0; }
+  .link-row { display: grid; grid-template-columns: 130px 1fr auto; gap: 8px; margin-bottom: 8px; }
+  .link-row select, .link-row input { padding: 10px 12px; border-radius: 4px; }
+  .remove-link { background: transparent; border: 1px solid var(--border); color: var(--danger); width: 38px; border-radius: 4px; cursor: pointer; font-size: 16px; transition: all .15s; }
+  .remove-link:hover { background: rgba(248,113,113,0.1); border-color: var(--danger); }
+  .preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 8px; margin-top: 8px; }
+  .preset { aspect-ratio: 1; border-radius: 4px; cursor: pointer; border: 1px solid transparent; transition: all .15s; }
+  .preset:hover { opacity: 0.8; }
+  .preset.active { border-color: var(--text); }
+  .header-actions { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+  .share-url { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 8px 12px; color: var(--text-dim); font-size: 12px; font-family: 'JetBrains Mono', monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .profile-wrapper { min-height: calc(100vh - 53px); display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; background-size: cover; background-position: center; }
+  .profile-card { width: 100%; max-width: 480px; text-align: center; background: rgba(0,0,0,0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 48px 32px; position: relative; z-index: 1; }
+  .profile-avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; display: block; border: 2px solid rgba(255,255,255,0.1); }
+  .profile-avatar-placeholder { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 20px; background: var(--surface-2); border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 600; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .profile-username { font-size: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; background: var(--info); border-radius: 50%; color: #000; }
+  .verified-badge svg { width: 10px; height: 10px; }
+  .profile-bio { color: var(--text-dim); font-size: 14px; margin: 0 0 28px; }
+  .profile-links { display: flex; flex-direction: column; gap: 8px; }
+  .profile-link { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: var(--text); text-decoration: none; font-weight: 500; font-size: 14px; transition: all .15s; }
+  .profile-link:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+  .profile-link svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.8; }
+  .banned-screen { text-align: center; padding: 60px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
+  .banned-screen h2 { color: var(--danger); margin-bottom: 8px; font-size: 18px; }
+  .not-found { text-align: center; padding: 80px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; }
+  .not-found h2 { font-size: 24px; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+  .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .admin-header h2 { font-size: 18px; font-weight: 600; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; font-family: 'JetBrains Mono', monospace; }
+  .stat-card .num { font-size: 18px; font-weight: 600; }
+  .stat-card .label { font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.05em; }
+  .users-table { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .user-row { display: grid; grid-template-columns: 2.2fr 1fr 1.2fr auto; gap: 16px; padding: 14px 18px; border-bottom: 1px solid var(--border); align-items: center; }
-  .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; background-size: cover; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-  .badge-admin { background: rgba(139,92,246,0.15); color: var(--accent); }
-  .badge-verified { background: rgba(59,130,246,0.15); color: var(--info); }
-  .badge-banned { background: rgba(239,68,68,0.15); color: var(--danger); }
-  #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
-  .toast { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; color: var(--text); font-size: 14px; animation: slideIn .3s ease; display: flex; align-items: center; gap: 10px; min-width: 250px; }
-  .toast.success { border-color: rgba(16,185,129,0.35); }
-  .toast.error { border-color: rgba(239,68,68,0.35); }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-  .modal-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; max-width: 420px; width: 100%; }
-  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+  .user-row:last-child { border-bottom: none; }
+  .user-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 4px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--text); flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; background-size: cover; background-position: center; }
+  .user-name { font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .badge { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid; font-family: 'JetBrains Mono', monospace; }
+  .badge-admin { color: var(--text); border-color: var(--text); background: transparent; }
+  .badge-verified { color: var(--info); border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.1); }
+  .badge-banned { color: var(--danger); border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.1); }
+  @media (max-width: 760px) { .user-row { grid-template-columns: 1fr; gap: 10px; } }
+  #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 1000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .toast { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; color: var(--text); font-size: 13px; animation: slideIn .2s ease; pointer-events: auto; display: flex; align-items: center; gap: 10px; min-width: 250px; max-width: 360px; font-family: 'JetBrains Mono', monospace; }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+  @keyframes slideIn { from { transform: translateX(110%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn .2s ease; }
+  .modal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 400px; width: 100%; }
+  .modal-card h3 { font-size: 16px; margin-bottom: 8px; font-weight: 600; }
+  .modal-card p { color: var(--text-dim); margin-bottom: 20px; font-size: 13px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .status-box { padding: 12px; border-radius: 6px; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-bottom: 16px; border: 1px solid; }
+  .status-pending { background: rgba(96,165,250,0.1); border-color: var(--info); color: var(--info); }
+  .status-verified { background: rgba(52,211,153,0.1); border-color: var(--success); color: var(--success); }
+  .status-none { background: var(--surface-2); border-color: var(--border); color: var(--text-dim); }
 </style>
 </head>
 <body>
-  <div class="bg-effects"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
   <div id="toast-container"></div>
 
   <nav id="nav" class="hidden">
     <div class="nav-inner">
-      <div class="nav-logo" id="nav-logo">novi.bio</div>
+      <div class="nav-logo" id="nav-logo">novi<span>.bio</span></div>
       <div class="nav-links" id="nav-links"></div>
     </div>
   </nav>
 
   <section id="view-auth" class="view">
     <div class="auth-card">
-      <div class="brand"><h1>novi.bio</h1></div>
-      <p class="subtitle">Your link in bio, reimagined.</p>
+      <div class="brand">
+        <h1>novi<span>.bio</span></h1>
+        <p>Your link in bio, reimagined.</p>
+      </div>
       <div class="tabs">
         <button class="tab active" data-tab="login">Login</button>
         <button class="tab" data-tab="register">Register</button>
       </div>
       <form id="login-form">
-        <div class="form-group"><label>Username</label><input type="text" id="login-username" required></div>
-        <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+        <div class="form-group"><label>Username or Email</label><input type="text" id="login-identifier" required></div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <div class="form-footer">
+          <button type="button" class="link-btn" id="forgot-password-btn">Forgot password?</button>
+        </div>
         <button type="submit" class="btn btn-block">Login</button>
       </form>
       <form id="register-form" class="hidden">
+        <div class="form-group"><label>Email (Optional)</label><input type="email" id="register-email" placeholder="For password resets"></div>
         <div class="form-group"><label>Username</label><input type="text" id="register-username" required pattern="[a-zA-Z0-9_]{3,20}"></div>
         <div class="form-group"><label>Password</label><input type="password" id="register-password" required minlength="4"></div>
         <button type="submit" class="btn btn-block">Create Account</button>
@@ -129,29 +165,40 @@
         <div class="share-url" id="share-url"></div>
         <button class="btn btn-ghost btn-sm" id="copy-share-btn">Copy Link</button>
       </div>
+      
       <div class="dash-grid">
-        <div class="dash-card">
-          <h2>Profile Editor</h2>
-          <p class="hint">Customize your page. Changes save to the cloud instantly.</p>
-          <form id="profile-form">
-            <div class="section-title">Identity</div>
-            <div class="form-group"><label>Profile Picture URL</label><input type="url" id="profile-avatar" placeholder="https://..."></div>
-            <div class="form-group"><label>Bio</label><textarea id="profile-bio" maxlength="200" placeholder="Tell the world..."></textarea></div>
-            <div class="section-title">Background</div>
-            <div class="form-group"><label>Background Color</label><input type="color" id="profile-bgcolor" value="#0a0a0f" style="height: 44px;"></div>
-            <div class="form-group"><label>Or pick a preset</label><div class="preset-grid" id="preset-grid"></div></div>
-            <div class="section-title">Social Links</div>
-            <div id="links-container"></div>
-            <button type="button" class="btn btn-ghost btn-sm" id="add-link-btn">+ Add Link</button>
-            <div style="margin-top: 26px; display: flex; gap: 8px;">
-              <button type="submit" class="btn">Save Profile</button>
-              <a href="#/profile" class="btn btn-ghost">Preview Public Page</a>
-            </div>
-          </form>
+        <div>
+          <div class="dash-card">
+            <h2>Profile Editor</h2>
+            <p class="hint">// customize your page</p>
+            <form id="profile-form">
+              <div class="section-title">Identity</div>
+              <div class="form-group"><label>Profile Picture URL</label><input type="url" id="profile-avatar" placeholder="https://..."></div>
+              <div class="form-group"><label>Bio</label><textarea id="profile-bio" maxlength="200" placeholder="Tell the world..."></textarea></div>
+              <div class="section-title">Background</div>
+              <div class="form-group"><label>Background Color</label><input type="color" id="profile-bgcolor" value="#0a0a0f" style="height: 40px; padding: 4px;"></div>
+              <div class="form-group"><label>Or pick a preset</label><div class="preset-grid" id="preset-grid"></div></div>
+              <div class="section-title">Social Links</div>
+              <div id="links-container"></div>
+              <button type="button" class="btn btn-ghost btn-sm" id="add-link-btn">+ Add Link</button>
+              <div style="margin-top: 24px; display: flex; gap: 8px;">
+                <button type="submit" class="btn">Save Profile</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- New Account Security Card -->
+          <div class="dash-card">
+            <h2>Account Security</h2>
+            <p class="hint">// add email for password resets</p>
+            <div id="email-status-box"></div>
+            <div id="email-management-area"></div>
+          </div>
         </div>
+
         <div class="dash-card">
           <h2>Live Preview</h2>
-          <p class="hint">This is how your profile looks.</p>
+          <p class="hint">// real-time view</p>
           <div id="preview-container"></div>
         </div>
       </div>
@@ -161,31 +208,54 @@
   <section id="view-profile" class="view hidden"><div id="profile-content"></div></section>
   <section id="view-admin" class="view hidden">
     <div class="container">
-      <h2 style="margin-bottom: 24px;">Admin Panel</h2>
-      <div class="dash-card" style="padding: 0; overflow: hidden;">
+      <div class="admin-header">
+        <h2>Admin Panel</h2>
+        <div id="admin-stats" style="display: flex; gap: 8px;"></div>
+      </div>
+      <div class="users-table">
         <div id="admin-users"></div>
       </div>
     </div>
   </section>
 
+  <!-- Password Reset Modal -->
+  <div id="reset-modal" class="modal hidden">
+    <div class="modal-card">
+      <h3>Reset Password</h3>
+      <p>Enter your account email and we'll send you a link to reset your password.</p>
+      <div class="form-group" style="margin-bottom: 0;">
+        <input type="email" id="reset-email-input" placeholder="your@email.com" style="background: var(--bg);">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost btn-sm" id="reset-cancel">Cancel</button>
+        <button class="btn btn-sm" id="reset-submit">Send Reset Link</button>
+      </div>
+    </div>
+  </div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, updateEmail } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   // =========================================================================
-  // PASTE YOUR FIREBASE CONFIG HERE
-  // Replace all the fake text below with your actual config from Firebase
+  // 1. PASTE YOUR FIREBASE CONFIG HERE
   // =========================================================================
   const firebaseConfig = {
-  apiKey: "AIzaSyCmau5W45YfH593mOMllQCZ8QR1HnKTQTQ",
-  authDomain: "novi-bio.firebaseapp.com",
-  projectId: "novi-bio",
-  storageBucket: "novi-bio.firebasestorage.app",
-  messagingSenderId: "263303078432",
-  appId: "1:263303078432:web:d7de28c471531592bbd245",
-  measurementId: "G-00SX8WMLSX"
-};
+    apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXX",
+    authDomain: "your-project.firebaseapp.com",
+    projectId: "your-project",
+    storageBucket: "your-project.appspot.com",
+    messagingSenderId: "XXXXXXX",
+    appId: "1:XXXXXXX:web:XXXXXXX"
+  };
+
+  // =========================================================================
+  // 2. PASTE YOUR EMAILJS KEYS HERE (For sending the 6-digit code email)
+  // =========================================================================
+  const EMAILJS_SERVICE_ID = "service_as8k07v";
+  const EMAILJS_TEMPLATE_ID = "template_y7vfb1m";
+  const EMAILJS_PUBLIC_KEY = "OpsG9qFj66J46w0Yn";
   // =========================================================================
 
   const app = initializeApp(firebaseConfig);
@@ -200,18 +270,34 @@
     const c = $('#toast-container');
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    const i = { success: '✓', error: '✕', info: 'ℹ' };
-    const col = { success: 'var(--success)', error: 'var(--danger)', info: 'var(--info)' };
-    t.innerHTML = `<span style="color:${col[type]}">${i[type]}</span><span>${escapeHtml(msg)}</span>`;
+    t.textContent = msg;
     c.appendChild(t);
-    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 3000);
+    setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 200); }, 4000);
+  }
+
+  // Helper to send the 6-digit code via EmailJS
+  async function sendVerificationEmail(email, code) {
+    const data = {
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: EMAILJS_TEMPLATE_ID,
+      user_id: EMAILJS_PUBLIC_KEY,
+      template_params: { to_email: email, code: code }
+    };
+    
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    if (!res.ok) throw new Error('Failed to send email');
+    return true;
   }
 
   const PRESETS = [
-    { name: 'Midnight', bg: 'linear-gradient(135deg, #0f0c29, #302b63, #24243e)' },
-    { name: 'Sunset', bg: 'linear-gradient(135deg, #ff6b6b, #feca57, #ff9ff3)' },
-    { name: 'Purple', bg: 'linear-gradient(135deg, #2e0249, #570a57, #8b5cf6)' },
-    { name: 'Dark', bg: '#0a0a0f' }
+    { name: 'Black', bg: '#000000' }, { name: 'Midnight', bg: '#0a0a0f' },
+    { name: 'Dark Gray', bg: '#1a1a1a' }, { name: 'Navy', bg: '#001233' },
+    { name: 'Purple', bg: '#2e0249' }, { name: 'Forest', bg: '#134e5e' }
   ];
   const PLATFORMS = [
     { id: 'website', name: 'Website' }, { id: 'twitter', name: 'Twitter' }, 
@@ -219,11 +305,11 @@
     { id: 'email', name: 'Email' }
   ];
   const ICONS = {
-    twitter: '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-    instagram: '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>',
-    github: '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
-    website: '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.155c2.995 0 5.727 1.075 7.854 2.86-.414-.024-.834.012-1.245.087-1.41.255-2.385 1.485-2.685 3.045-.165.855-.06 1.755.27 2.535.285.69.78 1.275 1.41 1.665.585.36 1.275.495 1.95.39.405-.06.795-.21 1.14-.42-.06.5-.16 1.01-.31 1.51-.27.8-.66 1.55-1.18 2.21-.42.55-.93 1.06-1.5 1.49-.66.49-1.39.86-2.16 1.09-.83.27-1.71.4-2.6.4-1.05 0-2.07-.17-3.04-.5-.85-.29-1.65-.71-2.36-1.25-.69-.53-1.31-1.16-1.83-1.87-.51-.71-.92-1.49-1.21-2.32-.3-.86-.45-1.77-.45-2.69 0-1.13.22-2.23.65-3.26.42-1.01 1.04-1.93 1.81-2.71.78-.78 1.7-1.4 2.71-1.82.42-.18.85-.32 1.29-.42z"/></svg>',
-    email: '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>'
+    twitter: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
+    instagram: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>',
+    github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
+    website: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.155c2.995 0 5.727 1.075 7.854 2.86-.414-.024-.834.012-1.245.087-1.41.255-2.385 1.485-2.685 3.045-.165.855-.06 1.755.27 2.535.285.69.78 1.275 1.41 1.665.585.36 1.275.495 1.95.39.405-.06.795-.21 1.14-.42-.06.5-.16 1.01-.31 1.51-.27.8-.66 1.55-1.18 2.21-.42.55-.93 1.06-1.5 1.49-.66.49-1.39.86-2.16 1.09-.83.27-1.71.4-2.6.4-1.05 0-2.07-.17-3.04-.5-.85-.29-1.65-.71-2.36-1.25-.69-.53-1.31-1.16-1.83-1.87-.51-.71-.92-1.49-1.21-2.32-.3-.86-.45-1.77-.45-2.69 0-1.13.22-2.23.65-3.26.42-1.01 1.04-1.93 1.81-2.71.78-.78 1.7-1.4 2.71-1.82.42-.18.85-.32 1.29-.42z"/></svg>',
+    email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>'
   };
 
   const App = {
@@ -264,6 +350,11 @@
       $('#profile-form').addEventListener('submit', e => this.handleSaveProfile(e));
       $('#add-link-btn').addEventListener('click', () => this.addLinkRow());
 
+      // Password Reset Modal
+      $('#forgot-password-btn').addEventListener('click', () => $('#reset-modal').classList.remove('hidden'));
+      $('#reset-cancel').addEventListener('click', () => $('#reset-modal').classList.add('hidden'));
+      $('#reset-submit').addEventListener('click', () => this.handlePasswordReset());
+
       ['profile-avatar', 'profile-bio'].forEach(id => $('#' + id).addEventListener('input', () => this.updatePreview()));
       $('#profile-bgcolor').addEventListener('input', () => {
         $$('.preset.active').forEach(p => p.classList.remove('active'));
@@ -276,7 +367,24 @@
         const url = window.location.origin + window.location.pathname + '#/u/' + this.currentUser.username;
         navigator.clipboard.writeText(url).then(() => toast('Share link copied!', 'success'));
       });
-      document.addEventListener('click', e => { if (e.target.id === 'logout-btn') signOut(auth); });
+      document.addEventListener('click', e => { 
+        if (e.target.id === 'logout-btn') signOut(auth);
+        if (e.target.id === 'send-code-btn') this.handleSendCode();
+        if (e.target.id === 'verify-code-btn') this.handleVerifyCode();
+      });
+    },
+
+    async handlePasswordReset() {
+      const email = $('#reset-email-input').value.trim();
+      if (!email) return toast('Please enter your email.', 'error');
+      try {
+        await sendPasswordResetEmail(auth, email);
+        toast('Password reset email sent! Check your inbox.', 'success');
+        $('#reset-modal').classList.add('hidden');
+        $('#reset-email-input').value = '';
+      } catch (err) {
+        toast(err.message.replace('Firebase: ', ''), 'error');
+      }
     },
 
     async handleRoute() {
@@ -330,26 +438,39 @@
       $('#nav-links').innerHTML = `
         <a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a>
         <a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>
-        ${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin Panel</a>` : ''}
+        ${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin</a>` : ''}
         <button id="logout-btn">Logout</button>
       `;
     },
 
     async handleRegister(e) {
       e.preventDefault();
+      const emailInput = $('#register-email').value.trim();
       const username = $('#register-username').value.trim().toLowerCase();
       const password = $('#register-password').value;
+      
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
 
+      // If no email provided, assign a fake one to satisfy Firebase Auth
+      const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}@novi.local`;
+
       try {
-        const cred = await createUserWithEmailAndPassword(auth, username + '@novi.bio', password);
+        const q = query(collection(db, 'users'), where('username', '==', username));
+        const snap = await getDocs(q);
+        if (!snap.empty) return toast('Username already taken.', 'error');
+
+        const cred = await createUserWithEmailAndPassword(auth, emailToUse, password);
         const isAdmin = username === 'novi';
+        
         await setDoc(doc(db, 'users', cred.user.uid), {
-          username: username, avatar: '', bio: '', bgColor: '#0a0a0f', bgPreset: null, links: [],
+          username: username, 
+          email: emailToUse,
+          emailVerified: emailToUse !== `${username}@novi.local`, // true if real email provided at start, false if fake
+          avatar: '', bio: '', bgColor: '#000000', bgPreset: null, links: [],
           banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now()
         });
+        
         toast('Account created!', 'success');
-        if (isAdmin) setTimeout(() => toast('Super Admin privileges activated.', 'info'), 500);
         window.location.hash = '/dashboard';
       } catch (err) {
         toast(err.message.replace('Firebase: ', ''), 'error');
@@ -358,14 +479,30 @@
 
     async handleLogin(e) {
       e.preventDefault();
-      const username = $('#login-username').value.trim().toLowerCase();
+      const identifier = $('#login-identifier').value.trim();
       const password = $('#login-password').value;
+      
+      if (!identifier || !password) return toast('Please fill in all fields', 'error');
+
       try {
-        await signInWithEmailAndPassword(auth, username + '@novi.bio', password);
+        let emailToLogin = identifier;
+        
+        // If they entered a username instead of an email, look up their real email
+        if (!identifier.includes('@')) {
+          const q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
+          const snap = await getDocs(q);
+          if (snap.empty) return toast('User not found.', 'error');
+          
+          const userData = snap.docs[0].data();
+          if (userData.banned) return toast('This account has been banned.', 'error');
+          emailToLogin = userData.email;
+        }
+
+        await signInWithEmailAndPassword(auth, emailToLogin, password);
         toast('Welcome back!', 'success');
         window.location.hash = '/dashboard';
       } catch (err) {
-        toast('Invalid username or password.', 'error');
+        toast('Invalid login credentials.', 'error');
       }
     },
 
@@ -373,9 +510,9 @@
       $('#share-url').textContent = window.location.origin + window.location.pathname + '#/u/' + user.username;
       $('#profile-avatar').value = user.avatar || '';
       $('#profile-bio').value = user.bio || '';
-      $('#profile-bgcolor').value = (user.bgColor && user.bgColor.startsWith('#')) ? user.bgColor : '#0a0a0f';
+      $('#profile-bgcolor').value = (user.bgColor && user.bgColor.startsWith('#')) ? user.bgColor : '#000000';
       
-      $('#preset-grid').innerHTML = PRESETS.map((p, i) => `<div class="preset ${user.bgPreset === i ? 'active' : ''}" data-preset="${i}" style="background: ${p.bg}"></div>`).join('');
+      $('#preset-grid').innerHTML = PRESETS.map((p, i) => `<div class="preset ${user.bgPreset === i ? 'active' : ''}" data-preset="${i}" style="background: ${p.bg}" title="${p.name}"></div>`).join('');
       $$('.preset').forEach(el => el.addEventListener('click', () => {
         $$('.preset').forEach(x => x.classList.remove('active'));
         el.classList.add('active');
@@ -386,7 +523,105 @@
       if (user.links && user.links.length > 0) user.links.forEach(l => this.addLinkRow(l));
       else this.addLinkRow();
 
+      this.renderEmailSection(user);
       this.updatePreview();
+    },
+
+    // ====================================================================
+    // NEW: 6-DIGIT CODE EMAIL VERIFICATION SYSTEM
+    // ====================================================================
+    renderEmailSection(user) {
+      const statusBox = $('#email-status-box');
+      const area = $('#email-management-area');
+      
+      const isFakeEmail = !user.email || user.email.endsWith('@novi.local');
+      
+      if (user.pendingEmail) {
+        // State: Waiting for code verification
+        statusBox.innerHTML = `<div class="status-box status-pending">PENDING VERIFICATION: ${escapeHtml(user.pendingEmail)}</div>`;
+        area.innerHTML = `
+          <div class="form-group"><label>Enter 6-Digit Code</label><input type="text" id="code-input" maxlength="6" placeholder="123456" style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div>
+          <button id="verify-code-btn" class="btn btn-block">Verify Email</button>
+        `;
+      } else if (isFakeEmail) {
+        // State: No real email added yet
+        statusBox.innerHTML = `<div class="status-box status-none">NO EMAIL ADDED</div>`;
+        area.innerHTML = `
+          <div class="form-group"><label>Add Email Address</label><input type="email" id="new-email-input" placeholder="your@email.com"></div>
+          <button id="send-code-btn" class="btn btn-block">Send Verification Code</button>
+        `;
+      } else {
+        // State: Verified email
+        statusBox.innerHTML = `<div class="status-box status-verified">VERIFIED: ${escapeHtml(user.email)}</div>`;
+        area.innerHTML = `
+          <div class="form-group"><label>Change Email Address</label><input type="email" id="new-email-input" placeholder="new@email.com"></div>
+          <button id="send-code-btn" class="btn btn-ghost btn-block">Send Verification Code</button>
+        `;
+      }
+    },
+
+    async handleSendCode() {
+      if (!this.currentUser) return;
+      const newEmail = $('#new-email-input').value.trim();
+      if (!newEmail || !newEmail.includes('@')) return toast('Please enter a valid email.', 'error');
+
+      // Generate 6-digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+      try {
+        // Save code and pending email to Firestore
+        await updateDoc(doc(db, 'users', this.currentUser.uid), {
+          pendingEmail: newEmail,
+          verificationCode: code
+        });
+        
+        this.currentUser.pendingEmail = newEmail;
+        this.currentUser.verificationCode = code;
+
+        // Send email via EmailJS
+        await sendVerificationEmail(newEmail, code);
+        toast('Verification code sent to your email!', 'success');
+        
+        // Re-render the UI to show the code input
+        this.renderEmailSection(this.currentUser);
+      } catch (err) {
+        toast('Failed to send code. Check EmailJS keys.', 'error');
+        console.error(err);
+      }
+    },
+
+    async handleVerifyCode() {
+      if (!this.currentUser) return;
+      const enteredCode = $('#code-input').value.trim();
+      
+      if (enteredCode !== this.currentUser.verificationCode) {
+        return toast('Invalid verification code.', 'error');
+      }
+
+      try {
+        // Update Firebase Auth email
+        await updateEmail(auth.currentUser, this.currentUser.pendingEmail);
+        
+        // Update Firestore
+        await updateDoc(doc(db, 'users', this.currentUser.uid), {
+          email: this.currentUser.pendingEmail,
+          emailVerified: true,
+          pendingEmail: null,
+          verificationCode: null
+        });
+
+        // Update local state
+        this.currentUser.email = this.currentUser.pendingEmail;
+        this.currentUser.emailVerified = true;
+        delete this.currentUser.pendingEmail;
+        delete this.currentUser.verificationCode;
+
+        toast('Email verified and updated successfully!', 'success');
+        this.renderEmailSection(this.currentUser);
+      } catch (err) {
+        toast('Error updating email. Try logging out and back in.', 'error');
+        console.error(err);
+      }
     },
 
     addLinkRow(data = null) {
@@ -440,7 +675,7 @@
         return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[l.platform] || ICONS.website}<span>${escapeHtml(PLATFORMS.find(p=>p.id===l.platform)?.name || 'Link')}</span></a>`;
       }).join('');
       const badge = user.verified ? `<span class="verified-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></span>` : '';
-      return `<div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#0a0a0f')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 56px)'};"><div class="profile-card">${av}<div class="profile-username">@${escapeHtml(user.username)} ${badge}</div><p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p><div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:13px;">No links added.</p>'}</div></div></div>`;
+      return `<div class="profile-wrapper" style="background: ${escapeHtml(user.bgColor || '#000000')}; min-height: ${isPreview ? '420px' : 'calc(100vh - 53px)'};"><div class="profile-card">${av}<div class="profile-username">@${escapeHtml(user.username)} ${badge}</div><p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p><div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div></div></div>`;
     },
 
     async renderProfileView(username) {
@@ -453,14 +688,14 @@
         const user = { uid: snap.docs[0].id, ...snap.docs[0].data() };
         
         if (user.banned) {
-          content.innerHTML = `<div class="profile-wrapper" style="background: var(--bg);"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`;
+          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`;
         } else {
           content.innerHTML = this.profileHtml(user);
         }
         $('#view-profile').classList.remove('hidden');
         if (this.currentUser) this.renderNav(this.currentUser);
       } catch (err) {
-        content.innerHTML = `<div class="profile-wrapper" style="background: var(--bg);"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`;
+        content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`;
         $('#view-profile').classList.remove('hidden');
       }
     },
@@ -469,28 +704,43 @@
       try {
         const snap = await getDocs(collection(db, 'users'));
         let html = '';
+        let stats = { total: 0, verified: 0, banned: 0 };
+        
         snap.forEach(d => {
+          stats.total++;
           const u = d.data();
+          if (u.verified) stats.verified++;
+          if (u.banned) stats.banned++;
           const uid = d.id;
           const av = u.avatar ? `background-image: url('${escapeHtml(u.avatar)}')` : '';
-          html += `<div class="user-row" style="padding: 14px 18px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 2fr 1fr auto; gap: 16px; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 12px;">
+          const displayEmail = u.email && !u.email.endsWith('@novi.local') ? escapeHtml(u.email) : 'No email';
+          
+          html += `<div class="user-row">
+            <div class="user-info">
               <div class="user-avatar" style="${av}">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div>
               <div>
-                <div style="font-weight: 600;">@${escapeHtml(u.username)} ${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''} ${u.verified ? '<span class="badge badge-verified">Verified</span>' : ''} ${u.banned ? '<span class="badge badge-banned">Banned</span>' : ''}</div>
-                <div style="font-size: 12px; color: var(--text-dim);">Joined ${new Date(u.createdAt || Date.now()).toLocaleDateString()}</div>
+                <div class="user-name">@${escapeHtml(u.username)} ${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''} ${u.verified ? '<span class="badge badge-verified">Verified</span>' : ''} ${u.banned ? '<span class="badge badge-banned">Banned</span>' : ''}</div>
+                <div style="font-size: 11px; color: var(--text-mute); font-family: 'JetBrains Mono', monospace;">${displayEmail}</div>
               </div>
             </div>
             <div style="color: var(--text-dim); font-size: 13px;">${(u.links || []).length} links</div>
+            <div style="color: var(--text-mute); font-size: 13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family: 'JetBrains Mono', monospace;">${u.bio ? escapeHtml(u.bio.substring(0, 30)) + '...' : 'null'}</div>
             <div style="display: flex; gap: 6px;">
               ${u.role !== 'admin' ? `
-                <button class="btn btn-sm ${u.banned ? 'btn-success' : 'btn-danger'}" data-action="ban" data-uid="${uid}">${u.banned ? 'Unban' : 'Ban'}</button>
-                <button class="btn btn-sm ${u.verified ? 'btn-ghost' : ''}" data-action="verify" data-uid="${uid}" style="${u.verified ? 'background: var(--info);' : ''}">${u.verified ? 'Remove Badge' : 'Give Badge'}</button>
-              ` : '<span style="color: var(--text-mute); font-size: 12px;">Protected</span>'}
+                <button class="btn btn-sm ${u.banned ? 'btn-ghost' : 'btn-danger'}" data-action="ban" data-uid="${uid}">${u.banned ? 'Unban' : 'Ban'}</button>
+                <button class="btn btn-sm ${u.verified ? 'btn-ghost' : 'btn-success'}" data-action="verify" data-uid="${uid}">${u.verified ? 'Unverify' : 'Verify'}</button>
+              ` : '<span style="color: var(--text-mute); font-size: 11px; font-family: monospace;">protected</span>'}
             </div>
           </div>`;
         });
-        $('#admin-users').innerHTML = html || '<p style="padding: 24px; color: var(--text-dim); text-align:center;">No users registered yet.</p>';
+        
+        $('#admin-stats').innerHTML = `
+          <div class="stat-card"><div class="num">${stats.total}</div><div class="label">Total</div></div>
+          <div class="stat-card"><div class="num">${stats.verified}</div><div class="label">Verified</div></div>
+          <div class="stat-card"><div class="num">${stats.banned}</div><div class="label">Banned</div></div>
+        `;
+        
+        $('#admin-users').innerHTML = html || '<p style="padding: 24px; color: var(--text-mute); text-align:center; font-family: monospace;">// no users found</p>';
 
         $$('#admin-users [data-action]').forEach(btn => {
           btn.addEventListener('click', async () => {
