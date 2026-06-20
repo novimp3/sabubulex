@@ -15,7 +15,7 @@
     if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
   };
 </script>
-  <script>
+<script>
   // DevTools Freeze Trap
   setInterval(function() {
     const start = performance.now();
@@ -340,7 +340,7 @@
   // =========================================================================
   // 1. PASTE YOUR FIREBASE CONFIG HERE
   // =========================================================================
-  const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCmau5W45YfH593mOMllQCZ8QR1HnKTQTQ",
   authDomain: "novi-bio.firebaseapp.com",
   projectId: "novi-bio",
@@ -349,7 +349,6 @@
   appId: "1:263303078432:web:d7de28c471531592bbd245",
   measurementId: "G-00SX8WMLSX"
 };
-
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE
   // =========================================================================
@@ -575,7 +574,8 @@
       
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
 
-      const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}@novi.local`;
+      // Generate a unique fake email if they didn't provide one to prevent Auth conflicts
+      const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}_${Math.random().toString(36).substring(2, 8)}@novi.local`;
 
       try {
         // Check if username is taken or locked
@@ -598,7 +598,9 @@
         
         const allUsersSnap = await getDocs(collection(db, 'users'));
         let maxNum = 0;
-        allUsersSnap.forEach(d => { if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; });
+        allUsersSnap.forEach(d => { 
+          if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; 
+        });
         const userNumber = maxNum + 1;
         
         await setDoc(doc(db, 'users', cred.user.uid), {
@@ -891,6 +893,16 @@
         snap.forEach(d => { if (!d.data().banned) activeUser = { uid: d.id, ...d.data() }; });
         if (!activeUser) throw new Error('Banned');
         
+        // Dynamically calculate user number if missing (for older accounts)
+        if (!activeUser.userNumber) {
+          const allUsersSnap = await getDocs(collection(db, 'users'));
+          let allUsers = [];
+          allUsersSnap.forEach(d => allUsers.push(d.data()));
+          allUsers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          const index = allUsers.findIndex(u => u.username === username.toLowerCase() && !u.banned);
+          if (index !== -1) activeUser.userNumber = index + 1;
+        }
+
         content.innerHTML = this.profileHtml(activeUser);
         $('#view-profile').classList.remove('hidden');
         if (this.currentUser) this.renderNav(this.currentUser);
@@ -907,23 +919,25 @@
     async renderAdmin() {
       try {
         const snap = await getDocs(collection(db, 'users'));
+        let allUsers = [];
+        snap.forEach(d => allUsers.push({ uid: d.id, ...d.data() }));
+        
+        // Sort by creation date and assign user number dynamically to ensure all old accounts get one
+        allUsers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        allUsers.forEach((u, index) => {
+          if (!u.userNumber) u.userNumber = index + 1;
+        });
+
         let activeUsers = [];
         let bannedUsers = [];
         let stats = { total: 0, active: 0, verified: 0, banned: 0 };
         
-        snap.forEach(d => {
-          const u = { uid: d.id, ...d.data() };
+        allUsers.forEach(u => {
           stats.total++;
           const userBadges = u.badges || (u.verified ? ['verified'] : []);
           if (userBadges.includes('verified')) stats.verified++;
-          
-          if (u.banned) {
-            stats.banned++;
-            bannedUsers.push(u);
-          } else {
-            stats.active++;
-            activeUsers.push(u);
-          }
+          if (u.banned) { stats.banned++; bannedUsers.push(u); }
+          else { stats.active++; activeUsers.push(u); }
         });
 
         $('#stat-total').textContent = stats.total;
@@ -955,7 +969,8 @@
               <button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}">Badges</button>
               ${u.role !== 'admin' ? `
                 ${this.adminTab === 'active' ? `<button class="btn btn-sm btn-danger" data-action="ban" data-uid="${uid}">Ban</button>` : `<button class="btn btn-sm btn-success" data-action="unban" data-uid="${uid}">Unban</button>`}
-              ` : ''}
+                <button class="btn btn-sm btn-ghost" data-action="promote" data-uid="${uid}">Make Admin</button>
+              ` : (uid !== this.currentUser.uid ? `<button class="btn btn-sm btn-ghost" data-action="demote" data-uid="${uid}">Remove Admin</button>` : '')}
             </div>
           </div>`;
         });
@@ -975,6 +990,14 @@
             } else if (action === 'unban') {
               await updateDoc(targetDoc, { banned: false, usernameLocked: false });
               toast('User unbanned.', 'success');
+              this.renderAdmin();
+            } else if (action === 'promote') {
+              await updateDoc(targetDoc, { role: 'admin' });
+              toast('User promoted to Admin.', 'success');
+              this.renderAdmin();
+            } else if (action === 'demote') {
+              await updateDoc(targetDoc, { role: 'user' });
+              toast('Admin demoted to User.', 'success');
               this.renderAdmin();
             } else if (action === 'badges') {
               this.openBadgeModal(uid);
