@@ -5,19 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>novi.bio</title>
 <script>
-  // Disable Right-Click
+  // Disable Right-Click & DevTools
   document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-  // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
   document.onkeydown = function(e) {
-    if(e.keyCode == 123) return false; // F12
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
-    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+    if(e.keyCode == 123) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false;
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false;
   };
 </script>
-  <script>
+   <script>
   // DevTools Freeze Trap
   setInterval(function() {
     const start = performance.now();
@@ -160,10 +158,12 @@
         <h1>novi<span>.bio</span></h1>
         <p>Your link in bio, reimagined.</p>
       </div>
-      <div class="tabs">
+      <div class="tabs" id="auth-tabs">
         <button class="tab active" data-tab="login">Login</button>
         <button class="tab" data-tab="register">Register</button>
       </div>
+      
+      <!-- Standard Login -->
       <form id="login-form">
         <div class="form-group"><label>Username or Email</label><input type="text" id="login-identifier" required></div>
         <div class="form-group">
@@ -175,6 +175,19 @@
         </div>
         <button type="submit" class="btn btn-block">Login</button>
       </form>
+
+      <!-- 2FA Login Step -->
+      <form id="twofa-form" class="hidden">
+        <h3 style="font-size: 16px; margin-bottom: 8px; font-weight: 600;">2-Step Verification</h3>
+        <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 16px;">Enter the 6-digit code sent to your email.</p>
+        <div class="form-group">
+          <label>6-Digit Code</label>
+          <input type="text" id="twofa-code-input" maxlength="6" required style="text-align: center; font-family: monospace; letter-spacing: 4px;">
+        </div>
+        <button type="submit" class="btn btn-block">Verify & Login</button>
+        <button type="button" id="cancel-2fa-btn" class="link-btn" style="margin-top: 16px; width: 100%; text-align: center;">Cancel</button>
+      </form>
+
       <form id="register-form" class="hidden">
         <div class="form-group"><label>Email (Optional)</label><input type="email" id="register-email" placeholder="For password resets"></div>
         <div class="form-group"><label>Username</label><input type="text" id="register-username" required pattern="[a-zA-Z0-9_]{3,20}"></div>
@@ -215,9 +228,18 @@
 
           <div class="dash-card">
             <h2>Account Security</h2>
-            <p class="hint">// add email for password resets</p>
+            <p class="hint">// add email for password resets & 2FA</p>
             <div id="email-status-box"></div>
             <div id="email-management-area"></div>
+            <div id="twofa-management-area" class="hidden" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <div style="font-weight: 600; font-size: 14px;">2-Step Verification</div>
+                  <div style="color: var(--text-mute); font-size: 12px; font-family: 'JetBrains Mono', monospace;">require code on every login</div>
+                </div>
+                <button id="toggle-2fa-btn" class="btn btn-sm btn-ghost"></button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -266,21 +288,20 @@
   // 1. PASTE YOUR FIREBASE CONFIG HERE
   // =========================================================================
   const firebaseConfig = {
-  apiKey: "AIzaSyCmau5W45YfH593mOMllQCZ8QR1HnKTQTQ",
-  authDomain: "novi-bio.firebaseapp.com",
-  projectId: "novi-bio",
-  storageBucket: "novi-bio.firebasestorage.app",
-  messagingSenderId: "263303078432",
-  appId: "1:263303078432:web:d7de28c471531592bbd245",
-  measurementId: "G-00SX8WMLSX"
-};
+    apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXX",
+    authDomain: "your-project.firebaseapp.com",
+    projectId: "your-project",
+    storageBucket: "your-project.appspot.com",
+    messagingSenderId: "XXXXXXX",
+    appId: "1:XXXXXXX:web:XXXXXXX"
+  };
 
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE (For sending the 6-digit code email)
   // =========================================================================
-  const EMAILJS_SERVICE_ID = "service_as8k07v";
-  const EMAILJS_TEMPLATE_ID = "template_y7vfb1m";
-  const EMAILJS_PUBLIC_KEY = "OpsG9qFj66J46w0Yn";
+  const EMAILJS_SERVICE_ID = "service_XXXXXXX";
+  const EMAILJS_TEMPLATE_ID = "template_XXXXXXX";
+  const EMAILJS_PUBLIC_KEY = "XXXXXXXXXXXXXXX";
   // =========================================================================
 
   const app = initializeApp(firebaseConfig);
@@ -337,6 +358,7 @@
   const App = {
     currentRoute: '',
     currentUser: null,
+    tempLoginData: null, // Used to hold email/password during 2FA
 
     init() {
       this.bindEvents();
@@ -365,9 +387,17 @@
         t.classList.add('active');
         $('#login-form').classList.toggle('hidden', t.dataset.tab !== 'login');
         $('#register-form').classList.toggle('hidden', t.dataset.tab !== 'register');
+        $('#twofa-form').classList.add('hidden');
       }));
 
       $('#login-form').addEventListener('submit', e => this.handleLogin(e));
+      $('#twofa-form').addEventListener('submit', e => this.handleVerify2FA(e));
+      $('#cancel-2fa-btn').addEventListener('click', () => {
+        $('#twofa-form').classList.add('hidden');
+        $('#login-form').classList.remove('hidden');
+        this.tempLoginData = null;
+      });
+
       $('#register-form').addEventListener('submit', e => this.handleRegister(e));
       $('#profile-form').addEventListener('submit', e => this.handleSaveProfile(e));
       $('#add-link-btn').addEventListener('click', () => this.addLinkRow());
@@ -392,6 +422,7 @@
         if (e.target.id === 'logout-btn') signOut(auth);
         if (e.target.id === 'send-code-btn') this.handleSendCode();
         if (e.target.id === 'verify-code-btn') this.handleVerifyCode();
+        if (e.target.id === 'toggle-2fa-btn') this.handleToggle2FA();
       });
     },
 
@@ -486,6 +517,7 @@
           username: username, 
           email: emailToUse,
           emailVerified: false, 
+          twoFactorEnabled: false,
           avatar: '', bio: '', bgColor: '#000000', bgPreset: null, links: [],
           banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now()
         });
@@ -505,16 +537,38 @@
       if (!identifier || !password) return toast('Please fill in all fields', 'error');
 
       try {
+        let userDocId = null;
+        let userData = null;
         let emailToLogin = identifier;
         
-        if (!identifier.includes('@')) {
-          const q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
-          const snap = await getDocs(q);
-          if (snap.empty) return toast('User not found.', 'error');
+        // Find user in DB to get email and check 2FA status
+        let q;
+        if (identifier.includes('@')) {
+          q = query(collection(db, 'users'), where('email', '==', identifier.toLowerCase()));
+        } else {
+          q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
+        }
+        
+        const snap = await getDocs(q);
+        if (snap.empty) return toast('User not found.', 'error');
+        
+        userDocId = snap.docs[0].id;
+        userData = snap.docs[0].data();
+        emailToLogin = userData.email;
+
+        if (userData.banned) return toast('This account has been banned.', 'error');
+
+        // Check if 2FA is enabled
+        if (userData.twoFactorEnabled) {
+          const code = Math.floor(100000 + Math.random() * 900000).toString();
+          await updateDoc(doc(db, 'users', userDocId), { pendingTwoFactorCode: code });
+          await sendVerificationEmail(emailToLogin, code);
           
-          const userData = snap.docs[0].data();
-          if (userData.banned) return toast('This account has been banned.', 'error');
-          emailToLogin = userData.email;
+          this.tempLoginData = { email: emailToLogin, password: password };
+          $('#login-form').classList.add('hidden');
+          $('#twofa-form').classList.remove('hidden');
+          toast('A 6-digit code was sent to your email.', 'info');
+          return;
         }
 
         await signInWithEmailAndPassword(auth, emailToLogin, password);
@@ -522,6 +576,36 @@
         window.location.hash = '/dashboard';
       } catch (err) {
         toast('Invalid login credentials.', 'error');
+      }
+    },
+
+    async handleVerify2FA(e) {
+      e.preventDefault();
+      const enteredCode = $('#twofa-code-input').value.trim();
+      if (!enteredCode || !this.tempLoginData) return toast('Error: Missing login data.', 'error');
+
+      try {
+        const q = query(collection(db, 'users'), where('email', '==', this.tempLoginData.email));
+        const snap = await getDocs(q);
+        if (snap.empty) return toast('Error: User vanished.', 'error');
+        
+        const userData = snap.docs[0].data();
+        if (enteredCode !== userData.pendingTwoFactorCode) {
+          return toast('Invalid 2FA code.', 'error');
+        }
+
+        await signInWithEmailAndPassword(auth, this.tempLoginData.email, this.tempLoginData.password);
+        await updateDoc(doc(db, 'users', snap.docs[0].id), { pendingTwoFactorCode: null });
+
+        this.tempLoginData = null;
+        $('#twofa-code-input').value = '';
+        $('#twofa-form').classList.add('hidden');
+        $('#login-form').classList.remove('hidden');
+        
+        toast('Welcome back!', 'success');
+        window.location.hash = '/dashboard';
+      } catch (err) {
+        toast('Verification failed.', 'error');
       }
     },
 
@@ -549,32 +633,52 @@
     renderEmailSection(user) {
       const statusBox = $('#email-status-box');
       const area = $('#email-management-area');
+      const twofaArea = $('#twofa-management-area');
       
       const isFakeEmail = !user.email || user.email.endsWith('@novi.local');
       
       if (user.pendingEmail) {
+        twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-pending">PENDING VERIFICATION: ${escapeHtml(user.pendingEmail)}</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Enter 6-Digit Code</label><input type="text" id="code-input" maxlength="6" placeholder="123456" style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div>
           <button id="verify-code-btn" class="btn btn-block">Verify Email</button>
         `;
       } else if (isFakeEmail) {
+        twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-none">NO EMAIL ADDED</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Add Email Address</label><input type="email" id="new-email-input" placeholder="your@email.com"></div>
           <button id="send-code-btn" class="btn btn-block">Send Verification Code</button>
         `;
       } else if (user.emailVerified) {
+        twofaArea.classList.remove('hidden');
         statusBox.innerHTML = `<div class="status-box status-verified">VERIFIED: ${escapeHtml(user.email)}</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Change Email Address</label><input type="email" id="new-email-input" placeholder="new@email.com"></div>
           <button id="send-code-btn" class="btn btn-ghost btn-block">Send Verification Code</button>
         `;
+        $('#toggle-2fa-btn').textContent = user.twoFactorEnabled ? 'Turn Off' : 'Turn On';
+        $('#toggle-2fa-btn').className = `btn btn-sm ${user.twoFactorEnabled ? 'btn-danger' : 'btn-success'}`;
       } else {
+        twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div class="status-box status-pending">UNVERIFIED: ${escapeHtml(user.email)}</div>`;
         area.innerHTML = `
           <button id="send-code-btn" class="btn btn-block">Send Verification Code to ${escapeHtml(user.email)}</button>
         `;
+      }
+    },
+
+    async handleToggle2FA() {
+      if (!this.currentUser) return;
+      const newState = !this.currentUser.twoFactorEnabled;
+      try {
+        await updateDoc(doc(db, 'users', this.currentUser.uid), { twoFactorEnabled: newState });
+        this.currentUser.twoFactorEnabled = newState;
+        toast(`2-Step Verification ${newState ? 'enabled' : 'disabled'}.`, 'success');
+        this.renderEmailSection(this.currentUser);
+      } catch (err) {
+        toast('Failed to update 2FA setting.', 'error');
       }
     },
 
