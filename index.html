@@ -39,6 +39,13 @@
   body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
   input, select, textarea { font-size: 16px !important; }
 
+  /* Entry Gate CAPTCHA */
+  #entry-gate { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9998; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.5s; }
+  .gate-card { width: 100%; max-width: 360px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+  .gate-card h3 { font-size: 18px; margin-bottom: 8px; }
+  .gate-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; font-family: 'JetBrains Mono', monospace; }
+  .captcha-canvas { border-radius: 8px; background: var(--bg); display: block; margin: 0 auto 12px; cursor: pointer; border: 1px solid var(--border); }
+  
   nav { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.85); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
   .nav-inner { max-width: 1200px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .nav-logo { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 18px; cursor: pointer; user-select: none; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -54,13 +61,11 @@
   .hidden { display: none !important; }
   .container { max-width: 1100px; margin: 0 auto; }
 
-  /* Home Page Polish */
   .hero { text-align: center; padding: 80px 20px 40px; background: radial-gradient(circle at 50% 0%, rgba(139,92,246,0.15) 0%, transparent 60%); border-radius: 20px; }
   .hero h1 { font-size: 64px; font-weight: 800; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.03em; background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
   .hero p { font-size: 18px; color: var(--text-dim); margin-top: 8px; margin-bottom: 24px; }
   .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
 
-  /* Username Checker */
   .username-checker { max-width: 450px; margin: 0 auto; }
   .checker-input-wrapper { display: flex; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px; align-items: center; transition: all .2s; }
   .checker-input-wrapper:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
@@ -99,7 +104,6 @@
   .stat-verified { border-top-color: var(--info); }
   .stat-verified .num { color: var(--info); } 
 
-  /* Auth */
   #view-auth { display: flex; align-items: center; justify-content: center; padding: 24px; }
   .auth-card { width: 100%; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
   .brand { margin-bottom: 24px; text-align: center; }
@@ -169,9 +173,7 @@
   .banned-screen { text-align: center; padding: 48px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 16px; }
   .not-found { text-align: center; padding: 64px 20px; border: 1px solid var(--border); background: var(--surface); border-radius: 16px; }
 
-  /* Admin */
   .admin-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-  
   .admin-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
   .admin-tab { padding: 10px 16px; background: transparent; border: none; color: var(--text-mute); font-weight: 500; font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: inherit; transition: all .2s; }
   .admin-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -227,6 +229,19 @@
 </style>
 </head>
 <body>
+  <!-- Entry Gate CAPTCHA -->
+  <div id="entry-gate">
+    <div class="gate-card">
+      <h3>Security Check</h3>
+      <p>// verify you are human</p>
+      <canvas id="gate-captcha" class="captcha-canvas" width="280" height="80" title="Click to refresh"></canvas>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <input type="text" id="gate-input" placeholder="Enter code" style="text-align: center; text-transform: uppercase; letter-spacing: 4px; font-family: monospace;">
+      </div>
+      <button id="gate-submit" class="btn btn-block">Enter novi.bio</button>
+    </div>
+  </div>
+
   <div id="toast-container"></div>
 
   <nav id="nav" class="hidden">
@@ -242,8 +257,6 @@
         <h1>novi<span>.bio</span></h1>
         <p>Your link in bio, reimagined.</p>
         <div class="hero-actions" id="hero-actions"></div>
-        
-        <!-- Username Availability Checker -->
         <div class="username-checker">
           <div class="checker-input-wrapper">
             <span class="prefix">@</span>
@@ -252,7 +265,6 @@
           </div>
           <div id="home-check-result" class="checker-result"></div>
         </div>
-
       </div>
       <div class="home-stats-grid" id="home-stats"></div>
       <div class="section-header"><h2>Recent Users</h2></div>
@@ -289,6 +301,11 @@
         <div class="form-group"><label>Email (Optional)</label><input type="email" id="register-email" placeholder="For password resets"></div>
         <div class="form-group"><label>Username</label><input type="text" id="register-username" required pattern="[a-zA-Z0-9_]{3,20}"></div>
         <div class="form-group"><label>Password</label><input type="password" id="register-password" required minlength="4"></div>
+        <div class="form-group">
+          <label>Verification</label>
+          <canvas id="reg-captcha" class="captcha-canvas" width="280" height="70" title="Click to refresh"></canvas>
+          <input type="text" id="reg-captcha-input" placeholder="Enter code" style="text-transform: uppercase; letter-spacing: 2px;">
+        </div>
         <button type="submit" class="btn btn-block">Create Account</button>
       </form>
     </div>
@@ -459,6 +476,50 @@
     return true;
   }
 
+  // Fixed, highly readable CAPTCHA Generator
+  function generateCaptcha(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return '';
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0a0a0f';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    let text = '';
+    for(let i=0; i<5; i++) text += chars.charAt(Math.floor(Math.random() * chars.length));
+    
+    // Subtle noise lines
+    for(let i=0; i<4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(Math.random()*canvas.width, Math.random()*canvas.height);
+      ctx.lineTo(Math.random()*canvas.width, Math.random()*canvas.height);
+      ctx.strokeStyle = `rgba(255, 255, 255, 0.15)`;
+      ctx.stroke();
+    }
+    
+    ctx.font = 'bold 36px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const colors = ['#8b5cf6', '#ec4899', '#06b6d4', '#34d399', '#fbbf24'];
+    
+    for(let i=0; i<text.length; i++) {
+      ctx.save();
+      const x = (canvas.width / 6) * (i + 1);
+      const y = canvas.height / 2 + (Math.random() - 0.5) * 10;
+      ctx.translate(x, y);
+      ctx.rotate((Math.random() - 0.5) * 0.3);
+      ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.fillText(text[i], 0, 0);
+      ctx.restore();
+    }
+    return text;
+  }
+
+  let gateCaptchaText = '';
+  let regCaptchaText = '';
+
   const PRESETS = [
     { name: 'Black', bg: '#000000' }, { name: 'Midnight', bg: '#0a0a0f' },
     { name: 'Dark Gray', bg: '#1a1a1a' }, { name: 'Navy', bg: '#001233' },
@@ -480,7 +541,7 @@
     github: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>',
     website: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 1.155c2.995 0 5.727 1.075 7.854 2.86-.414-.024-.834.012-1.245.087-1.41.255-2.385 1.485-2.685 3.045-.165.855-.06 1.755.27 2.535.285.69.78 1.275 1.41 1.665.585.36 1.275.495 1.95.39.405-.06.795-.21 1.14-.42-.06.5-.16 1.01-.31 1.51-.27.8-.66 1.55-1.18 2.21-.42.55-.93 1.06-1.5 1.49-.66.49-1.39.86-2.16 1.09-.83.27-1.71.4-2.6.4-1.05 0-2.07-.17-3.04-.5-.85-.29-1.65-.71-2.36-1.25-.69-.53-1.31-1.16-1.83-1.87-.51-.71-.92-1.49-1.21-2.32-.3-.86-.45-1.77-.45-2.69 0-1.13.22-2.23.65-3.26.42-1.01 1.04-1.93 1.81-2.71.78-.78 1.7-1.4 2.71-1.82.42-.18.85-.32 1.29-.42z"/></svg>',
     email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M0 3v18h24V3H0zm21.518 2L12 12.713 2.482 5h19.036zM2 19V7.183l10 8.104 10-8.104V19H2z"/></svg>',
-    discord: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.010c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>',
+    discord: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.010c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.010c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>',
     tiktok: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>',
     youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>',
     eye: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>'
@@ -539,6 +600,9 @@
         $('#login-form').classList.toggle('hidden', t.dataset.tab !== 'login');
         $('#register-form').classList.toggle('hidden', t.dataset.tab !== 'register');
         $('#twofa-form').classList.add('hidden');
+        if (t.dataset.tab === 'register') {
+          regCaptchaText = generateCaptcha('reg-captcha');
+        }
       }));
 
       $('#login-form').addEventListener('submit', e => this.handleLogin(e));
@@ -560,7 +624,7 @@
       $('#badge-cancel').addEventListener('click', () => $('#badge-modal').classList.remove('hidden'));
       $('#badge-save').addEventListener('click', () => this.handleSaveBadges());
 
-      $('#edit-cancel').addEventListener('click', () => $('#edit-user-modal').classList.add('hidden'));
+      $('#edit-cancel').addEventListener('click', () => $('#edit-user-modal').classList.remove('hidden'));
       $('#edit-save').addEventListener('click', () => this.handleAdminSaveUser());
       $('#edit-ban-btn').addEventListener('click', () => this.handleAdminBanUser());
 
@@ -577,13 +641,9 @@
         navigator.clipboard.writeText(url).then(() => toast('Share link copied!', 'success'));
       });
       
-      // Username Checker Event Listener
       $('#home-check-btn').addEventListener('click', () => this.handleCheckUsername());
       $('#home-check-username').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.handleCheckUsername();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); this.handleCheckUsername(); }
       });
 
       document.addEventListener('click', e => { 
@@ -597,6 +657,38 @@
           this.adminTab = e.target.dataset.adminTab;
           this.renderAdmin();
         }
+        if (e.target.id === 'gate-captcha') gateCaptchaText = generateCaptcha('gate-captcha');
+        if (e.target.id === 'reg-captcha') regCaptchaText = generateCaptcha('reg-captcha');
+      });
+
+      // CAPTCHA Gate Logic
+      if (sessionStorage.getItem('passed_gate') === '1') {
+        $('#entry-gate').style.display = 'none';
+      } else {
+        gateCaptchaText = generateCaptcha('gate-captcha');
+        
+        const verifyGate = () => {
+          const val = $('#gate-input').value.trim().toUpperCase();
+          if (val === gateCaptchaText) {
+            sessionStorage.setItem('passed_gate', '1');
+            $('#entry-gate').style.opacity = '0';
+            setTimeout(() => { $('#entry-gate').style.display = 'none'; }, 500);
+          } else {
+            toast('Incorrect code. Try again.', 'error');
+            gateCaptchaText = generateCaptcha('gate-captcha');
+            $('#gate-input').value = '';
+          }
+        };
+
+        $('#gate-submit').addEventListener('click', verifyGate);
+        $('#gate-input').addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); verifyGate(); }
+        });
+      }
+
+      // Reg CAPTCHA Enter Key
+      $('#reg-captcha-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); $('#register-form').requestSubmit(); }
       });
     },
 
@@ -604,46 +696,22 @@
       const input = $('#home-check-username');
       const result = $('#home-check-result');
       const username = input.value.trim().toLowerCase();
-
-      if (!username) {
-        result.textContent = 'Please enter a username.';
-        result.className = 'checker-result taken';
-        return;
-      }
-      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
-        result.textContent = 'Invalid format (3-20 chars, letters/numbers/_)';
-        result.className = 'checker-result taken';
-        return;
-      }
-
-      result.textContent = 'Checking...';
-      result.className = 'checker-result checking';
-
+      if (!username) { result.textContent = 'Please enter a username.'; result.className = 'checker-result taken'; return; }
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { result.textContent = 'Invalid format (3-20 chars, letters/numbers/_)'; result.className = 'checker-result taken'; return; }
+      result.textContent = 'Checking...'; result.className = 'checker-result checking';
       try {
         const q = query(collection(db, 'users'), where('username', '==', username));
         const snap = await getDocs(q);
         let isAvailable = true;
-
         if (!snap.empty) {
           snap.forEach(doc => {
             const u = doc.data();
-            if (!u.banned || u.usernameLocked) {
-              isAvailable = false;
-            }
+            if (!u.banned || u.usernameLocked) isAvailable = false;
           });
         }
-
-        if (isAvailable) {
-          result.textContent = `@${username} is available!`;
-          result.className = 'checker-result available';
-        } else {
-          result.textContent = `@${username} is already taken.`;
-          result.className = 'checker-result taken';
-        }
-      } catch (err) {
-        result.textContent = 'Error checking username.';
-        result.className = 'checker-result taken';
-      }
+        if (isAvailable) { result.textContent = `@${username} is available!`; result.className = 'checker-result available'; } 
+        else { result.textContent = `@${username} is already taken.`; result.className = 'checker-result taken'; }
+      } catch (err) { result.textContent = 'Error checking username.'; result.className = 'checker-result taken'; }
     },
 
     async handlePasswordReset() {
@@ -654,70 +722,43 @@
         toast('Password reset email sent!', 'success');
         $('#reset-modal').classList.add('hidden');
         $('#reset-email-input').value = '';
-      } catch (err) {
-        toast(err.message.replace('Firebase: ', ''), 'error');
-      }
+      } catch (err) { toast(err.message.replace('Firebase: ', ''), 'error'); }
     },
 
     async handleRoute() {
       const hash = window.location.hash.slice(1) || '/';
       this.currentRoute = hash.startsWith('/') ? hash : '/' + hash;
-
       $$('.view').forEach(v => v.classList.add('hidden'));
       $('#nav').classList.add('hidden');
 
       const profileMatch = this.currentRoute.match(/^\/u\/(.+)$/);
-      if (profileMatch) {
-        await this.renderProfileView(decodeURIComponent(profileMatch[1]));
-        return;
-      }
-
-      if (this.currentRoute === '/' || this.currentRoute === '') {
-        await this.renderHome();
-        return;
-      }
-
+      if (profileMatch) { await this.renderProfileView(decodeURIComponent(profileMatch[1])); return; }
+      if (this.currentRoute === '/' || this.currentRoute === '') { await this.renderHome(); return; }
       if (this.currentRoute === '/login') {
         if (this.currentUser) { window.location.hash = '/dashboard'; return; }
-        this.renderNav(this.currentUser);
-        $('#view-auth').classList.remove('hidden');
-        return;
+        this.renderNav(this.currentUser); $('#view-auth').classList.remove('hidden'); return;
       }
-
       if (this.currentRoute === '/register') {
         if (this.currentUser) { window.location.hash = '/dashboard'; return; }
-        this.renderNav(this.currentUser);
-        $('#view-auth').classList.remove('hidden');
+        this.renderNav(this.currentUser); $('#view-auth').classList.remove('hidden');
         $$('.tab').forEach(x => x.classList.remove('active'));
         $('.tab[data-tab="register"]').classList.add('active');
-        $('#login-form').classList.add('hidden');
-        $('#register-form').classList.remove('hidden');
+        $('#login-form').classList.add('hidden'); $('#register-form').classList.remove('hidden');
+        regCaptchaText = generateCaptcha('reg-captcha');
         return;
       }
-
       if (this.currentRoute === '/dashboard') {
         if (!this.currentUser) { window.location.hash = '/login'; return; }
-        this.renderNav(this.currentUser);
-        this.renderDashboard(this.currentUser);
-        $('#view-dashboard').classList.remove('hidden');
-        return;
+        this.renderNav(this.currentUser); this.renderDashboard(this.currentUser); $('#view-dashboard').classList.remove('hidden'); return;
       }
-
       if (this.currentRoute === '/profile') {
         if (!this.currentUser) { window.location.hash = '/login'; return; }
-        this.renderNav(this.currentUser);
-        await this.renderProfileView(this.currentUser.username);
-        return;
+        this.renderNav(this.currentUser); await this.renderProfileView(this.currentUser.username); return;
       }
-
       if (this.currentRoute === '/admin') {
         if (!this.currentUser || this.currentUser.role !== 'admin') { window.location.hash = '/'; return; }
-        this.renderNav(this.currentUser);
-        await this.renderAdmin();
-        $('#view-admin').classList.remove('hidden');
-        return;
+        this.renderNav(this.currentUser); await this.renderAdmin(); $('#view-admin').classList.remove('hidden'); return;
       }
-
       $('#view-profile').classList.remove('hidden');
       $('#profile-content').innerHTML = '<div class="not-found"><h2>404</h2><p>Page not found.</p><a href="#/" class="btn">Go Home</a></div>';
     },
@@ -726,17 +767,9 @@
       $('#nav').classList.remove('hidden');
       let links = `<a href="#/" class="${this.currentRoute === '/' ? 'active' : ''}">Home</a>`;
       if (user) {
-        links += `
-          <a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a>
-          <a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>
-          ${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin</a>` : ''}
-          <button id="logout-btn">Logout</button>
-        `;
+        links += `<a href="#/dashboard" class="${this.currentRoute === '/dashboard' ? 'active' : ''}">Dashboard</a><a href="#/profile" class="${this.currentRoute === '/profile' ? 'active' : ''}">My Profile</a>${user.role === 'admin' ? `<a href="#/admin" class="${this.currentRoute === '/admin' ? 'active' : ''}">Admin</a>` : ''}<button id="logout-btn">Logout</button>`;
       } else {
-        links += `
-          <a href="#/login" class="${this.currentRoute === '/login' ? 'active' : ''}">Login</a>
-          <a href="#/register" class="${this.currentRoute === '/register' ? 'active' : ''}">Register</a>
-        `;
+        links += `<a href="#/login" class="${this.currentRoute === '/login' ? 'active' : ''}">Login</a><a href="#/register" class="${this.currentRoute === '/register' ? 'active' : ''}">Register</a>`;
       }
       $('#nav-links').innerHTML = links;
     },
@@ -744,60 +777,21 @@
     async renderHome() {
       this.renderNav(this.currentUser);
       $('#view-home').classList.remove('hidden');
-      
-      if (this.currentUser) {
-        $('#hero-actions').innerHTML = `<a href="#/dashboard" class="btn">Go to Dashboard</a>`;
-      } else {
-        $('#hero-actions').innerHTML = `<a href="#/register" class="btn">Get Started</a><a href="#/login" class="btn btn-ghost">Login</a>`;
-      }
-
-      $('#premium-badges-grid').innerHTML = PREMIUM_BADGES.map(b => `
-        <div class="premium-card">
-          <div class="badge-icon" style="background: ${b.color}">${b.svg}</div>
-          <div class="name">${b.name}</div>
-          <div class="desc">${b.desc}</div>
-        </div>
-      `).join('');
-
+      if (this.currentUser) { $('#hero-actions').innerHTML = `<a href="#/dashboard" class="btn">Go to Dashboard</a>`; } 
+      else { $('#hero-actions').innerHTML = `<a href="#/register" class="btn">Get Started</a><a href="#/login" class="btn btn-ghost">Login</a>`; }
+      $('#premium-badges-grid').innerHTML = PREMIUM_BADGES.map(b => `<div class="premium-card"><div class="badge-icon" style="background: ${b.color}">${b.svg}</div><div class="name">${b.name}</div><div class="desc">${b.desc}</div></div>`).join('');
       try {
         const snap = await getDocs(collection(db, 'users'));
         let stats = { total: 0, active: 0, verified: 0 };
         let recentUsers = [];
-        
-        snap.forEach(d => {
-          const u = d.data();
-          stats.total++;
-          if (!u.banned) {
-            stats.active++;
-            recentUsers.push({ uid: d.id, ...u });
-            const userBadges = u.badges || (u.verified ? ['verified'] : []);
-            if (userBadges.includes('verified')) stats.verified++;
-          }
-        });
-
-        $('#home-stats').innerHTML = `
-          <div class="stat-card"><div class="num">${stats.total}</div><div class="label">Total Users</div></div>
-          <div class="stat-card" style="border-top-color: var(--success);"><div class="num" style="color: var(--success);">${stats.active}</div><div class="label">Active Profiles</div></div>
-          <div class="stat-card" style="border-top-color: var(--accent);"><div class="num" style="color: var(--accent);">${stats.verified}</div><div class="label">Verified Users</div></div>
-        `;
-
+        snap.forEach(d => { const u = d.data(); stats.total++; if (!u.banned) { stats.active++; recentUsers.push({ uid: d.id, ...u }); const userBadges = u.badges || (u.verified ? ['verified'] : []); if (userBadges.includes('verified')) stats.verified++; } });
+        $('#home-stats').innerHTML = `<div class="stat-card"><div class="num">${stats.total}</div><div class="label">Total Users</div></div><div class="stat-card" style="border-top-color: var(--success);"><div class="num" style="color: var(--success);">${stats.active}</div><div class="label">Active Profiles</div></div><div class="stat-card" style="border-top-color: var(--accent);"><div class="num" style="color: var(--accent);">${stats.verified}</div><div class="label">Verified Users</div></div>`;
         recentUsers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         const topUsers = recentUsers.slice(0, 8);
-
         if (topUsers.length > 0) {
-          $('#home-users').innerHTML = topUsers.map(u => `
-            <a href="#/u/${u.username}" class="home-user-card">
-              <div class="user-avatar" style="background-image: ${u.avatar ? `url('${escapeHtml(u.avatar)}')` : 'none'}; width: 48px; height: 48px; border-radius: 50%;">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div>
-              <div class="name">@${escapeHtml(u.username)}</div>
-              <div class="badges">${this.getBadgesHtml(u)}</div>
-            </a>
-          `).join('');
-        } else {
-          $('#home-users').innerHTML = '<p style="color: var(--text-mute); text-align:center; grid-column: 1/-1;">No users yet. Be the first!</p>';
-        }
-      } catch (err) {
-        $('#home-stats').innerHTML = '<p style="color: var(--danger); text-align:center; grid-column: 1/-1;">Error loading stats.</p>';
-      }
+          $('#home-users').innerHTML = topUsers.map(u => `<a href="#/u/${u.username}" class="home-user-card"><div class="user-avatar" style="background-image: ${u.avatar ? `url('${escapeHtml(u.avatar)}')` : 'none'}; width: 48px; height: 48px; border-radius: 50%;">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div><div class="name">@${escapeHtml(u.username)}</div><div class="badges">${this.getBadgesHtml(u)}</div></a>`).join('');
+        } else { $('#home-users').innerHTML = '<p style="color: var(--text-mute); text-align:center; grid-column: 1/-1;">No users yet. Be the first!</p>'; }
+      } catch (err) { $('#home-stats').innerHTML = '<p style="color: var(--danger); text-align:center; grid-column: 1/-1;">Error loading stats.</p>'; }
     },
 
     async handleRegister(e) {
@@ -805,9 +799,16 @@
       const emailInput = $('#register-email').value.trim();
       const username = $('#register-username').value.trim().toLowerCase();
       const password = $('#register-password').value;
-      
-      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
+      const regCaptchaVal = $('#reg-captcha-input').value.trim().toUpperCase();
 
+      if (regCaptchaVal !== regCaptchaText) {
+        toast('Invalid CAPTCHA code.', 'error');
+        regCaptchaText = generateCaptcha('reg-captcha');
+        $('#reg-captcha-input').value = '';
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
       const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}_${Math.random().toString(36).substring(2, 8)}@novi.local`;
 
       try {
@@ -815,30 +816,20 @@
         const snap = await getDocs(q);
         if (!snap.empty) {
           let isAvailable = true;
-          snap.forEach(doc => {
-            const u = doc.data();
-            if (!u.banned || u.usernameLocked) isAvailable = false;
-          });
+          snap.forEach(doc => { const u = doc.data(); if (!u.banned || u.usernameLocked) isAvailable = false; });
           if (!isAvailable) return toast('Username already taken or locked.', 'error');
         }
-
         const cred = await createUserWithEmailAndPassword(auth, emailToUse, password);
         const isAdmin = username === 'novi';
-        
         const allUsersSnap = await getDocs(collection(db, 'users'));
         let maxNum = 0;
         allUsersSnap.forEach(d => { if (d.data().userNumber > maxNum) maxNum = d.data().userNumber; });
         const userNumber = maxNum + 1;
-        
         await setDoc(doc(db, 'users', cred.user.uid), {
-          username: username, email: emailToUse, emailVerified: false, twoFactorEnabled: false,
-          userNumber: userNumber, usernameLocked: false,
-          badges: isAdmin ? ['verified', 'founder'] : [],
-          avatar: '', bio: '', bgColor: '#000000', bgPreset: null, bgUrl: '', musicUrl: '', links: [],
-          banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now(),
-          profileViews: 0
+          username: username, email: emailToUse, emailVerified: false, twoFactorEnabled: false, userNumber: userNumber, usernameLocked: false,
+          badges: isAdmin ? ['verified', 'founder'] : [], avatar: '', bio: '', bgColor: '#000000', bgPreset: null, bgUrl: '', musicUrl: '', links: [],
+          banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now(), profileViews: 0
         });
-        
         toast('Account created!', 'success');
         window.location.hash = '/dashboard';
       } catch (err) {
@@ -854,18 +845,13 @@
 
       try {
         let q;
-        if (identifier.includes('@')) {
-          q = query(collection(db, 'users'), where('email', '==', identifier.toLowerCase()));
-        } else {
-          q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
-        }
+        if (identifier.includes('@')) { q = query(collection(db, 'users'), where('email', '==', identifier.toLowerCase())); } 
+        else { q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase())); }
         const snap = await getDocs(q);
         if (snap.empty) return toast('User not found.', 'error');
-        
         let activeDoc = null;
         snap.forEach(d => { if (!d.data().banned) activeDoc = d; });
         if (!activeDoc) return toast('This account has been banned.', 'error');
-        
         const userData = activeDoc.data();
         const emailToLogin = userData.email;
 
@@ -884,7 +870,10 @@
         toast('Welcome back!', 'success');
         window.location.hash = '/dashboard';
       } catch (err) {
-        toast('Invalid login credentials.', 'error');
+        let msg = 'Invalid login credentials.';
+        if (err.code === 'auth/unauthorized-domain') msg = 'This domain is not authorized in Firebase Auth settings.';
+        else if (err.code === 'auth/network-request-failed') msg = 'Network error. Check connection.';
+        toast(msg, 'error');
       }
     },
 
@@ -892,15 +881,12 @@
       e.preventDefault();
       const enteredCode = $('#twofa-code-input').value.trim();
       if (!enteredCode || !this.tempLoginData) return toast('Error: Missing login data.', 'error');
-
       try {
         const q = query(collection(db, 'users'), where('email', '==', this.tempLoginData.email));
         const snap = await getDocs(q);
         if (snap.empty) return toast('Error: User vanished.', 'error');
-        
         const userData = snap.docs[0].data();
         if (enteredCode !== userData.pendingTwoFactorCode) return toast('Invalid 2FA code.', 'error');
-
         await signInWithEmailAndPassword(auth, this.tempLoginData.email, this.tempLoginData.password);
         await updateDoc(doc(db, 'users', snap.docs[0].id), { pendingTwoFactorCode: null });
         this.tempLoginData = null;
@@ -909,9 +895,7 @@
         $('#login-form').classList.remove('hidden');
         toast('Welcome back!', 'success');
         window.location.hash = '/dashboard';
-      } catch (err) {
-        toast('Verification failed.', 'error');
-      }
+      } catch (err) { toast('Verification failed.', 'error'); }
     },
 
     renderDashboard(user) {
@@ -921,18 +905,10 @@
       $('#profile-bg-url').value = user.bgUrl || '';
       $('#profile-music-url').value = user.musicUrl || '';
       $('#profile-bgcolor').value = (user.bgColor && user.bgColor.startsWith('#')) ? user.bgColor : '#000000';
-      
       $('#preset-grid').innerHTML = PRESETS.map((p, i) => `<div class="preset ${user.bgPreset === i ? 'active' : ''}" data-preset="${i}" style="background: ${p.bg}" title="${p.name}"></div>`).join('');
-      $$('.preset').forEach(el => el.addEventListener('click', () => {
-        $$('.preset').forEach(x => x.classList.remove('active'));
-        el.classList.add('active');
-        this.updatePreview();
-      }));
-
+      $$('.preset').forEach(el => el.addEventListener('click', () => { $$('.preset').forEach(x => x.classList.remove('active')); el.classList.add('active'); this.updatePreview(); }));
       $('#links-container').innerHTML = '';
-      if (user.links && user.links.length > 0) user.links.forEach(l => this.addLinkRow(l));
-      else this.addLinkRow();
-
+      if (user.links && user.links.length > 0) user.links.forEach(l => this.addLinkRow(l)); else this.addLinkRow();
       this.renderEmailSection(user);
       this.updatePreview();
     },
@@ -942,7 +918,6 @@
       const area = $('#email-management-area');
       const twofaArea = $('#twofa-management-area');
       const isFakeEmail = !user.email || user.email.endsWith('@novi.local');
-      
       if (user.pendingEmail) {
         twofaArea.classList.add('hidden');
         statusBox.innerHTML = `<div style="padding: 12px; border-radius: 8px; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-bottom: 16px; border: 1px solid var(--info); background: rgba(96,165,250,0.1); color: var(--info);">PENDING VERIFICATION: ${escapeHtml(user.pendingEmail)}</div>`;
@@ -972,9 +947,7 @@
         this.currentUser.twoFactorEnabled = newState;
         toast(`2-Step Verification ${newState ? 'enabled' : 'disabled'}.`, 'success');
         this.renderEmailSection(this.currentUser);
-      } catch (err) {
-        toast('Failed to update 2FA setting.', 'error');
-      }
+      } catch (err) { toast('Failed to update 2FA setting.', 'error'); }
     },
 
     async handleSendCode() {
@@ -983,96 +956,54 @@
       const newEmail = input && input.value.trim() ? input.value.trim() : this.currentUser.email;
       if (!newEmail || !newEmail.includes('@')) return toast('Please enter a valid email.', 'error');
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-
       try {
         await updateDoc(doc(db, 'users', this.currentUser.uid), { pendingEmail: newEmail, verificationCode: code });
-        this.currentUser.pendingEmail = newEmail;
-        this.currentUser.verificationCode = code;
+        this.currentUser.pendingEmail = newEmail; this.currentUser.verificationCode = code;
         await sendVerificationEmail(newEmail, code);
         toast('Verification code sent to your email!', 'success');
         this.renderEmailSection(this.currentUser);
-      } catch (err) {
-        toast('Failed to send code.', 'error');
-      }
+      } catch (err) { toast('Failed to send code.', 'error'); }
     },
 
     async handleVerifyCode() {
       if (!this.currentUser) return;
       const enteredCode = $('#code-input').value.trim();
       if (enteredCode !== this.currentUser.verificationCode) return toast('Invalid verification code.', 'error');
-
       try {
         await updateEmail(auth.currentUser, this.currentUser.pendingEmail);
         const currentBadges = this.currentUser.badges || [];
         if (!currentBadges.includes('verified')) currentBadges.push('verified');
-        
-        await updateDoc(doc(db, 'users', this.currentUser.uid), {
-          email: this.currentUser.pendingEmail, emailVerified: true, pendingEmail: null,
-          verificationCode: null, verified: true, badges: currentBadges
-        });
-
-        this.currentUser.email = this.currentUser.pendingEmail;
-        this.currentUser.emailVerified = true;
-        this.currentUser.verified = true;
-        this.currentUser.badges = currentBadges;
-        delete this.currentUser.pendingEmail;
-        delete this.currentUser.verificationCode;
-
+        await updateDoc(doc(db, 'users', this.currentUser.uid), { email: this.currentUser.pendingEmail, emailVerified: true, pendingEmail: null, verificationCode: null, verified: true, badges: currentBadges });
+        this.currentUser.email = this.currentUser.pendingEmail; this.currentUser.emailVerified = true; this.currentUser.verified = true; this.currentUser.badges = currentBadges;
+        delete this.currentUser.pendingEmail; delete this.currentUser.verificationCode;
         toast('Email verified! You earned the Verified badge.', 'success');
-        this.renderEmailSection(this.currentUser);
-        this.updatePreview();
-      } catch (err) {
-        toast('Error updating email. Try logging out and back in.', 'error');
-      }
+        this.renderEmailSection(this.currentUser); this.updatePreview();
+      } catch (err) { toast('Error updating email. Try logging out and back in.', 'error'); }
     },
 
     addLinkRow(data = null) {
       const row = document.createElement('div');
       row.className = 'link-row';
-      row.innerHTML = `
-        <select class="link-platform">${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</select>
-        <input type="text" class="link-name" placeholder="Custom Name">
-        <input type="text" class="link-url" placeholder="URL or username">
-        <button type="button" class="remove-link">×</button>
-      `;
+      row.innerHTML = `<select class="link-platform">${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}</select><input type="text" class="link-name" placeholder="Custom Name"><input type="text" class="link-url" placeholder="URL or username"><button type="button" class="remove-link">×</button>`;
       $('#links-container').appendChild(row);
-      
       const platformSelect = row.querySelector('.link-platform');
       const urlInput = row.querySelector('.link-url');
-
-      const updatePlaceholder = () => {
-        const p = PLATFORMS.find(x => x.id === platformSelect.value);
-        urlInput.placeholder = p ? p.placeholder : 'URL or username';
-      };
-
+      const updatePlaceholder = () => { const p = PLATFORMS.find(x => x.id === platformSelect.value); urlInput.placeholder = p ? p.placeholder : 'URL or username'; };
       platformSelect.addEventListener('change', () => { updatePlaceholder(); this.updatePreview(); });
       updatePlaceholder();
-
-      if (data) {
-        platformSelect.value = data.platform;
-        urlInput.value = data.url;
-        row.querySelector('.link-name').value = data.name || '';
-        updatePlaceholder();
-      }
+      if (data) { platformSelect.value = data.platform; urlInput.value = data.url; row.querySelector('.link-name').value = data.name || ''; updatePlaceholder(); }
       row.querySelector('.remove-link').addEventListener('click', () => { row.remove(); this.updatePreview(); });
       urlInput.addEventListener('input', () => this.updatePreview());
       row.querySelector('.link-name').addEventListener('input', () => this.updatePreview());
     },
 
     getFormLinks() {
-      return $$('.link-row').map(r => ({
-        platform: r.querySelector('.link-platform').value,
-        name: r.querySelector('.link-name').value.trim(),
-        url: r.querySelector('.link-url').value.trim()
-      })).filter(l => l.url);
+      return $$('.link-row').map(r => ({ platform: r.querySelector('.link-platform').value, name: r.querySelector('.link-name').value.trim(), url: r.querySelector('.link-url').value.trim() })).filter(l => l.url);
     },
 
     getFormBackground() {
       const active = $('.preset.active');
-      if (active) {
-        const i = parseInt(active.dataset.preset);
-        return { bgPreset: i, bgColor: PRESETS[i].bg };
-      }
+      if (active) { const i = parseInt(active.dataset.preset); return { bgPreset: i, bgColor: PRESETS[i].bg }; }
       return { bgPreset: null, bgColor: $('#profile-bgcolor').value };
     },
 
@@ -1080,103 +1011,49 @@
       e.preventDefault();
       if (!this.currentUser) return;
       const { bgPreset, bgColor } = this.getFormBackground();
-      const data = {
-        avatar: $('#profile-avatar').value.trim(),
-        bio: $('#profile-bio').value.trim(),
-        bgUrl: $('#profile-bg-url').value.trim(),
-        musicUrl: $('#profile-music-url').value.trim(),
-        bgColor, bgPreset,
-        links: this.getFormLinks()
-      };
+      const data = { avatar: $('#profile-avatar').value.trim(), bio: $('#profile-bio').value.trim(), bgUrl: $('#profile-bg-url').value.trim(), musicUrl: $('#profile-music-url').value.trim(), bgColor, bgPreset, links: this.getFormLinks() };
       try {
         await updateDoc(doc(db, 'users', this.currentUser.uid), data);
         this.currentUser = { ...this.currentUser, ...data };
-        toast('Profile saved successfully!', 'success');
-        this.updatePreview();
-      } catch (err) {
-        toast('Error saving profile.', 'error');
-      }
+        toast('Profile saved successfully!', 'success'); this.updatePreview();
+      } catch (err) { toast('Error saving profile.', 'error'); }
     },
 
     getBadgesHtml(user) {
       const badges = user.badges || (user.verified ? ['verified'] : []);
-      return badges.map(b => {
-        if (BADGES[b]) return `<span class="profile-badge" style="background: ${BADGES[b].color}" title="${BADGES[b].name}">${BADGES[b].svg}</span>`;
-        return '';
-      }).join('');
+      return badges.map(b => { if (BADGES[b]) return `<span class="profile-badge" style="background: ${BADGES[b].color}" title="${BADGES[b].name}">${BADGES[b].svg}</span>`; return ''; }).join('');
     },
 
     updatePreview() {
       if (!this.currentUser) return;
       const { bgPreset, bgColor } = this.getFormBackground();
-      const previewData = {
-        ...this.currentUser,
-        avatar: $('#profile-avatar').value,
-        bio: $('#profile-bio').value,
-        bgUrl: $('#profile-bg-url').value,
-        musicUrl: $('#profile-music-url').value,
-        bgColor, bgPreset,
-        links: this.getFormLinks()
-      };
+      const previewData = { ...this.currentUser, avatar: $('#profile-avatar').value, bio: $('#profile-bio').value, bgUrl: $('#profile-bg-url').value, musicUrl: $('#profile-music-url').value, bgColor, bgPreset, links: this.getFormLinks() };
       $('#preview-container').innerHTML = this.profileHtml(previewData, true);
     },
 
     profileHtml(user, isPreview = false) {
       const av = user.avatar ? `<img src="${escapeHtml(user.avatar)}" class="profile-avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"><div class="profile-avatar-placeholder" style="display:none;">${escapeHtml(user.username.charAt(0))}</div>` : `<div class="profile-avatar-placeholder">${escapeHtml(user.username.charAt(0))}</div>`;
-      
       const links = (user.links || []).map(l => {
-        const platform = l.platform;
-        let href = l.url || '';
-        
+        const platform = l.platform; let href = l.url || '';
         if (!href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('mailto:')) {
-          if (platform === 'email') {
-            href = 'mailto:' + href;
-          } else if (platform === 'website') {
-            href = 'https://' + href;
-          } else if (platform === 'twitter') {
-            href = 'https://twitter.com/' + href.replace('@', '');
-          } else if (platform === 'instagram') {
-            href = 'https://instagram.com/' + href.replace('@', '');
-          } else if (platform === 'github') {
-            href = 'https://github.com/' + href.replace('@', '');
-          } else if (platform === 'discord') {
-            href = 'https://discord.com/users/' + href.replace('@', '');
-          } else if (platform === 'tiktok') {
-            href = 'https://tiktok.com/@' + href.replace('@', '');
-          } else if (platform === 'youtube') {
-            href = 'https://youtube.com/@' + href.replace('@', '');
-          } else {
-            href = 'https://' + href;
-          }
+          if (platform === 'email') href = 'mailto:' + href;
+          else if (platform === 'website') href = 'https://' + href;
+          else if (platform === 'twitter') href = 'https://twitter.com/' + href.replace('@', '');
+          else if (platform === 'instagram') href = 'https://instagram.com/' + href.replace('@', '');
+          else if (platform === 'github') href = 'https://github.com/' + href.replace('@', '');
+          else if (platform === 'discord') href = 'https://discord.com/users/' + href.replace('@', '');
+          else if (platform === 'tiktok') href = 'https://tiktok.com/@' + href.replace('@', '');
+          else if (platform === 'youtube') href = 'https://youtube.com/@' + href.replace('@', '');
+          else href = 'https://' + href;
         }
-        
         const displayName = l.name && l.name.trim() !== '' ? l.name : (PLATFORMS.find(p=>p.id===platform)?.name || 'Link');
         return `<a href="${escapeHtml(href)}" target="_blank" class="profile-link">${ICONS[platform] || ICONS.website}<span>${escapeHtml(displayName)}</span></a>`;
       }).join('');
-      
       const userNumHtml = user.userNumber ? `<span class="profile-user-number">User #${user.userNumber}</span>` : '';
       const viewsHtml = `<span class="profile-views">${ICONS.eye} ${user.profileViews || 0} views</span>`;
-      
       const bgStyle = user.bgUrl ? `background-image: url('${escapeHtml(user.bgUrl)}'); background-size: cover; background-position: center; background-attachment: fixed;` : `background: ${escapeHtml(user.bgColor || '#000000')};`;
-      
       const musicHtml = user.musicUrl ? `<audio controls class="music-player" src="${escapeHtml(user.musicUrl)}"></audio>` : '';
-
-      return `<div class="profile-wrapper" style="${bgStyle} min-height: ${isPreview ? '420px' : 'calc(100vh - 57px)'};">
-        <div class="profile-card">
-          ${av}
-          <div class="profile-user-header">
-            <div class="profile-username-row">
-              <span class="profile-username">@${escapeHtml(user.username)}</span>
-              <span class="profile-badges-container">${this.getBadgesHtml(user)}</span>
-            </div>
-            ${userNumHtml}
-            ${viewsHtml}
-          </div>
-          <p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p>
-          <div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div>
-          ${musicHtml}
-        </div>
-      </div>`;
+      return `<div class="profile-wrapper" style="${bgStyle} min-height: ${isPreview ? '420px' : 'calc(100vh - 57px)'};"><div class="profile-card">${av}<div class="profile-user-header"><div class="profile-username-row"><span class="profile-username">@${escapeHtml(user.username)}</span><span class="profile-badges-container">${this.getBadgesHtml(user)}</span></div>${userNumHtml}${viewsHtml}</div><p class="profile-bio">${user.bio ? escapeHtml(user.bio) : 'No bio yet.'}</p><div class="profile-links">${links || '<p style="color:var(--text-mute);font-size:12px;font-family:monospace;">// no links added</p>'}</div>${musicHtml}</div></div>`;
     },
 
     async renderProfileView(username) {
@@ -1185,11 +1062,9 @@
         const q = query(collection(db, 'users'), where('username', '==', username.toLowerCase()));
         const snap = await getDocs(q);
         if (snap.empty) throw new Error('Not found');
-        
         let activeUser = null;
         snap.forEach(d => { if (!d.data().banned) activeUser = { uid: d.id, ...d.data() }; });
         if (!activeUser) throw new Error('Banned');
-        
         if (!activeUser.userNumber) {
           const allUsersSnap = await getDocs(collection(db, 'users'));
           let allUsers = [];
@@ -1198,8 +1073,6 @@
           const index = allUsers.findIndex(u => u.username === username.toLowerCase() && !u.banned);
           if (index !== -1) activeUser.userNumber = index + 1;
         }
-
-        // Increment View Count (1 hour cooldown per user per browser)
         if (!this.currentUser || this.currentUser.uid !== activeUser.uid) {
           const lastView = localStorage.getItem('viewed_' + activeUser.uid);
           if (!lastView || Date.now() - parseInt(lastView) > 3600000) {
@@ -1208,16 +1081,12 @@
             localStorage.setItem('viewed_' + activeUser.uid, Date.now().toString());
           }
         }
-
         content.innerHTML = this.profileHtml(activeUser);
         $('#view-profile').classList.remove('hidden');
         if (this.currentUser) this.renderNav(this.currentUser);
       } catch (err) {
-        if (err.message === 'Banned') {
-          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`;
-        } else {
-          content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`;
-        }
+        if (err.message === 'Banned') { content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="banned-screen"><h2>This user is banned</h2><p>@${escapeHtml(username)} has been banned from novi.bio.</p></div></div>`; } 
+        else { content.innerHTML = `<div class="profile-wrapper" style="background: #000;"><div class="not-found"><h2>404</h2><p>User @${escapeHtml(username)} was not found.</p><a href="#/" class="btn">Go Home</a></div></div>`; }
         $('#view-profile').classList.remove('hidden');
       }
     },
@@ -1227,104 +1096,39 @@
         const snap = await getDocs(collection(db, 'users'));
         let allUsers = [];
         snap.forEach(d => allUsers.push({ uid: d.id, ...d.data() }));
-        
         allUsers.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
         allUsers.forEach((u, index) => { if (!u.userNumber) u.userNumber = index + 1; });
-
-        let activeUsers = [];
-        let bannedUsers = [];
-        let stats = { total: 0, active: 0, verified: 0, banned: 0 };
-        
-        allUsers.forEach(u => {
-          stats.total++;
-          const userBadges = u.badges || (u.verified ? ['verified'] : []);
-          if (userBadges.includes('verified')) stats.verified++;
-          if (u.banned) { stats.banned++; bannedUsers.push(u); }
-          else { stats.active++; activeUsers.push(u); }
-        });
-
-        $('#stat-total').textContent = stats.total;
-        $('#stat-active').textContent = stats.active;
-        $('#stat-verified').textContent = stats.verified;
-        $('#stat-banned').textContent = stats.banned;
-
+        let activeUsers = []; let bannedUsers = []; let stats = { total: 0, active: 0, verified: 0, banned: 0 };
+        allUsers.forEach(u => { stats.total++; const userBadges = u.badges || (u.verified ? ['verified'] : []); if (userBadges.includes('verified')) stats.verified++; if (u.banned) { stats.banned++; bannedUsers.push(u); } else { stats.active++; activeUsers.push(u); } });
+        $('#stat-total').textContent = stats.total; $('#stat-active').textContent = stats.active; $('#stat-verified').textContent = stats.verified; $('#stat-banned').textContent = stats.banned;
         const usersToRender = this.adminTab === 'active' ? activeUsers : bannedUsers;
         let html = '';
-
         usersToRender.forEach(u => {
-          const uid = u.uid;
-          const av = u.avatar ? `background-image: url('${escapeHtml(u.avatar)}')` : '';
+          const uid = u.uid; const av = u.avatar ? `background-image: url('${escapeHtml(u.avatar)}')` : '';
           const displayEmail = u.email && !u.email.endsWith('@novi.local') ? escapeHtml(u.email) : 'No email';
           const userNum = u.userNumber ? `#${u.userNumber}` : '#?';
-          
-          html += `<div class="user-row" data-uid="${uid}">
-            <div class="user-info">
-              <div class="user-avatar" style="${av}">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div>
-              <div>
-                <div class="user-name">@${escapeHtml(u.username)} <span style="color: var(--text-mute); font-size: 11px; font-family: 'JetBrains Mono', monospace;">${userNum}</span></div>
-                <div class="user-meta">${displayEmail}</div>
-              </div>
-            </div>
-            <div class="user-meta">${(u.links || []).length} links</div>
-            <div class="user-actions">
-              ${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''}
-              <button class="btn btn-sm btn-ghost" data-action="edit" data-uid="${uid}">Edit</button>
-              <button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}">Badges</button>
-              ${u.role !== 'admin' ? `
-                ${this.adminTab === 'active' ? `<button class="btn btn-sm btn-danger" data-action="ban" data-uid="${uid}">Ban</button>` : `<button class="btn btn-sm btn-success" data-action="unban" data-uid="${uid}">Unban</button>`}
-                <button class="btn btn-sm btn-ghost" data-action="promote" data-uid="${uid}">Make Admin</button>
-              ` : (uid !== this.currentUser.uid ? `<button class="btn btn-sm btn-ghost" data-action="demote" data-uid="${uid}">Remove Admin</button>` : '')}
-            </div>
-          </div>`;
+          html += `<div class="user-row" data-uid="${uid}"><div class="user-info"><div class="user-avatar" style="${av}">${u.avatar ? '' : escapeHtml(u.username.charAt(0).toUpperCase())}</div><div><div class="user-name">@${escapeHtml(u.username)} <span style="color: var(--text-mute); font-size: 11px; font-family: 'JetBrains Mono', monospace;">${userNum}</span></div><div class="user-meta">${displayEmail}</div></div></div><div class="user-meta">${(u.links || []).length} links</div><div class="user-actions">${u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : ''}<button class="btn btn-sm btn-ghost" data-action="edit" data-uid="${uid}">Edit</button><button class="btn btn-sm btn-ghost" data-action="badges" data-uid="${uid}">Badges</button>${u.role !== 'admin' ? `${this.adminTab === 'active' ? `<button class="btn btn-sm btn-danger" data-action="ban" data-uid="${uid}">Ban</button>` : `<button class="btn btn-sm btn-success" data-action="unban" data-uid="${uid}">Unban</button>`}<button class="btn btn-sm btn-ghost" data-action="promote" data-uid="${uid}">Make Admin</button>` : (uid !== this.currentUser.uid ? `<button class="btn btn-sm btn-ghost" data-action="demote" data-uid="${uid}">Remove Admin</button>` : '')}</div></div>`;
         });
-
         $('#admin-users').innerHTML = html || `<p style="padding: 24px; color: var(--text-mute); text-align:center; font-family: monospace;">// no users found</p>`;
-
         $$('#admin-users [data-action]').forEach(btn => {
           btn.addEventListener('click', async () => {
-            const uid = btn.dataset.uid;
-            const action = btn.dataset.action;
-            const targetDoc = doc(db, 'users', uid);
-            if (action === 'ban') {
-              await updateDoc(targetDoc, { banned: true });
-              toast('User banned.', 'success');
-              this.renderAdmin();
-            } else if (action === 'unban') {
-              await updateDoc(targetDoc, { banned: false, usernameLocked: false });
-              toast('User unbanned.', 'success');
-              this.renderAdmin();
-            } else if (action === 'promote') {
-              await updateDoc(targetDoc, { role: 'admin' });
-              toast('User promoted to Admin.', 'success');
-              this.renderAdmin();
-            } else if (action === 'demote') {
-              await updateDoc(targetDoc, { role: 'user' });
-              toast('Admin demoted to User.', 'success');
-              this.renderAdmin();
-            } else if (action === 'badges') {
-              this.openBadgeModal(uid);
-            } else if (action === 'edit') {
-              this.openEditModal(uid);
-            }
+            const uid = btn.dataset.uid; const action = btn.dataset.action; const targetDoc = doc(db, 'users', uid);
+            if (action === 'ban') { await updateDoc(targetDoc, { banned: true }); toast('User banned.', 'success'); this.renderAdmin(); } 
+            else if (action === 'unban') { await updateDoc(targetDoc, { banned: false, usernameLocked: false }); toast('User unbanned.', 'success'); this.renderAdmin(); } 
+            else if (action === 'promote') { await updateDoc(targetDoc, { role: 'admin' }); toast('User promoted to Admin.', 'success'); this.renderAdmin(); } 
+            else if (action === 'demote') { await updateDoc(targetDoc, { role: 'user' }); toast('Admin demoted to User.', 'success'); this.renderAdmin(); } 
+            else if (action === 'badges') { this.openBadgeModal(uid); } 
+            else if (action === 'edit') { this.openEditModal(uid); }
           });
         });
-      } catch (err) {
-        $('#admin-users').innerHTML = '<p style="padding: 24px; color: var(--danger); text-align:center;">Error loading users.</p>';
-      }
+      } catch (err) { $('#admin-users').innerHTML = '<p style="padding: 24px; color: var(--danger); text-align:center;">Error loading users.</p>'; }
     },
 
     async openBadgeModal(uid) {
       this.badgeTargetUid = uid;
       const snap = await getDoc(doc(db, 'users', uid));
       const currentBadges = snap.data().badges || (snap.data().verified ? ['verified'] : []);
-      
-      $('#badge-list').innerHTML = Object.keys(BADGES).map(key => `
-        <label class="badge-select-item" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-          <input type="checkbox" class="badge-check" value="${key}" ${currentBadges.includes(key) ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: var(--accent);">
-          <span style="color: ${BADGES[key].color}; display: flex; align-items: center;">${BADGES[key].svg}</span>
-          <span style="font-size: 14px;">${BADGES[key].name}</span>
-        </label>
-      `).join('');
+      $('#badge-list').innerHTML = Object.keys(BADGES).map(key => `<label class="badge-select-item" style="display: flex; align-items: center; gap: 12px; cursor: pointer;"><input type="checkbox" class="badge-check" value="${key}" ${currentBadges.includes(key) ? 'checked' : ''} style="width: 20px; height: 20px; accent-color: var(--accent);"><span style="color: ${BADGES[key].color}; display: flex; align-items: center;">${BADGES[key].svg}</span><span style="font-size: 14px;">${BADGES[key].name}</span></label>`).join('');
       $('#badge-modal').classList.remove('hidden');
     },
 
@@ -1334,81 +1138,46 @@
       try {
         await updateDoc(doc(db, 'users', this.badgeTargetUid), { badges: selected, verified: selected.includes('verified') });
         toast('Badges updated successfully!', 'success');
-        $('#badge-modal').classList.add('hidden');
-        this.badgeTargetUid = null;
-        this.renderAdmin();
-      } catch (err) {
-        toast('Failed to update badges.', 'error');
-      }
+        $('#badge-modal').classList.add('hidden'); this.badgeTargetUid = null; this.renderAdmin();
+      } catch (err) { toast('Failed to update badges.', 'error'); }
     },
 
     async openEditModal(uid) {
       this.editTargetUid = uid;
       const snap = await getDoc(doc(db, 'users', uid));
       const u = snap.data();
-      
       $('#edit-user-displayname').textContent = `@${u.username}`;
-      $('#edit-username').value = u.username;
-      $('#edit-bio').value = u.bio || '';
-      $('#edit-avatar').value = u.avatar || '';
-      $('#edit-views').value = u.profileViews || 0;
-      $('#edit-locked').checked = u.usernameLocked || false;
+      $('#edit-username').value = u.username; $('#edit-bio').value = u.bio || ''; $('#edit-avatar').value = u.avatar || ''; $('#edit-views').value = u.profileViews || 0; $('#edit-locked').checked = u.usernameLocked || false;
       $('#edit-ban-btn').textContent = u.banned ? 'Unban User' : 'Ban User';
       $('#edit-ban-btn').className = `btn btn-sm ${u.banned ? 'btn-success' : 'btn-danger'}`;
-      
       $('#edit-user-modal').classList.remove('hidden');
     },
 
     async handleAdminSaveUser() {
       if (!this.editTargetUid) return;
       const newUsername = $('#edit-username').value.trim().toLowerCase();
-      const newBio = $('#edit-bio').value.trim();
-      const newAvatar = $('#edit-avatar').value.trim();
-      const newViews = parseInt($('#edit-views').value) || 0;
-      const isLocked = $('#edit-locked').checked;
-
+      const newBio = $('#edit-bio').value.trim(); const newAvatar = $('#edit-avatar').value.trim(); const newViews = parseInt($('#edit-views').value) || 0; const isLocked = $('#edit-locked').checked;
       if (!newUsername) return toast('Username cannot be empty.', 'error');
-
       const q = query(collection(db, 'users'), where('username', '==', newUsername));
       const snap = await getDocs(q);
       let isAvailable = true;
-      snap.forEach(d => {
-        if (d.id !== this.editTargetUid) {
-          const u = d.data();
-          if (!u.banned || u.usernameLocked) isAvailable = false;
-        }
-      });
-
+      snap.forEach(d => { if (d.id !== this.editTargetUid) { const u = d.data(); if (!u.banned || u.usernameLocked) isAvailable = false; } });
       if (!isAvailable) return toast('Username is already taken or locked by another user.', 'error');
-
       try {
-        await updateDoc(doc(db, 'users', this.editTargetUid), {
-          username: newUsername, bio: newBio, avatar: newAvatar, usernameLocked: isLocked, profileViews: newViews
-        });
+        await updateDoc(doc(db, 'users', this.editTargetUid), { username: newUsername, bio: newBio, avatar: newAvatar, usernameLocked: isLocked, profileViews: newViews });
         toast('User updated successfully!', 'success');
-        $('#edit-user-modal').classList.add('hidden');
-        this.renderAdmin();
-      } catch (err) {
-        toast('Failed to update user.', 'error');
-      }
+        $('#edit-user-modal').classList.add('hidden'); this.renderAdmin();
+      } catch (err) { toast('Failed to update user.', 'error'); }
     },
 
     async handleAdminBanUser() {
       if (!this.editTargetUid) return;
       const targetDoc = doc(db, 'users', this.editTargetUid);
       const snap = await getDoc(targetDoc);
-      const isBanned = snap.data().banned;
-      const isLocked = $('#edit-locked').checked;
-
-      if (isBanned) {
-        await updateDoc(targetDoc, { banned: false, usernameLocked: false });
-        toast('User unbanned.', 'success');
-      } else {
-        await updateDoc(targetDoc, { banned: true, usernameLocked: isLocked });
-        toast(`User banned. Username ${isLocked ? 'LOCKED' : 'freed'}.`, 'success');
-      }
-      $('#edit-user-modal').classList.add('hidden');
-      this.renderAdmin();
+      const isBanned = snap.data().banned; const isLocked = $('#edit-locked').checked;
+      if (isBanned) { await updateDoc(targetDoc, { banned: false, usernameLocked: false }); toast('User unbanned.', 'success'); } 
+      else { await updateDoc(targetDoc, { banned: true, usernameLocked: isLocked }); toast(`User banned. Username ${isLocked ? 'LOCKED' : 'freed'}.`, 'success'); }
+      $('#edit-user-modal').classList.add('hidden'); this.renderAdmin();
     }
   };
 
