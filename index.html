@@ -187,7 +187,6 @@
             </form>
           </div>
 
-          <!-- New Account Security Card -->
           <div class="dash-card">
             <h2>Account Security</h2>
             <p class="hint">// add email for password resets</p>
@@ -218,7 +217,6 @@
     </div>
   </section>
 
-  <!-- Password Reset Modal -->
   <div id="reset-modal" class="modal hidden">
     <div class="modal-card">
       <h3>Reset Password</h3>
@@ -249,14 +247,14 @@
   messagingSenderId: "263303078432",
   appId: "1:263303078432:web:d7de28c471531592bbd245",
   measurementId: "G-00SX8WMLSX"
-};;
+};
 
   // =========================================================================
   // 2. PASTE YOUR EMAILJS KEYS HERE (For sending the 6-digit code email)
   // =========================================================================
-  const EMAILJS_SERVICE_ID = "service_as8k07v";
-  const EMAILJS_TEMPLATE_ID = "template_y7vfb1m";
-  const EMAILJS_PUBLIC_KEY = "OpsG9qFj66J46w0Yn";
+  const EMAILJS_SERVICE_ID = "service_XXXXXXX";
+  const EMAILJS_TEMPLATE_ID = "template_XXXXXXX";
+  const EMAILJS_PUBLIC_KEY = "XXXXXXXXXXXXXXX";
   // =========================================================================
 
   const app = initializeApp(firebaseConfig);
@@ -276,7 +274,6 @@
     setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 200); }, 4000);
   }
 
-  // Helper to send the 6-digit code via EmailJS
   async function sendVerificationEmail(email, code) {
     const data = {
       service_id: EMAILJS_SERVICE_ID,
@@ -284,13 +281,11 @@
       user_id: EMAILJS_PUBLIC_KEY,
       template_params: { to_email: email, code: code }
     };
-    
     const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
-    
     if (!res.ok) throw new Error('Failed to send email');
     return true;
   }
@@ -351,7 +346,6 @@
       $('#profile-form').addEventListener('submit', e => this.handleSaveProfile(e));
       $('#add-link-btn').addEventListener('click', () => this.addLinkRow());
 
-      // Password Reset Modal
       $('#forgot-password-btn').addEventListener('click', () => $('#reset-modal').classList.remove('hidden'));
       $('#reset-cancel').addEventListener('click', () => $('#reset-modal').classList.add('hidden'));
       $('#reset-submit').addEventListener('click', () => this.handlePasswordReset());
@@ -452,7 +446,6 @@
       
       if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return toast('Invalid username (3-20 chars).', 'error');
 
-      // If no email provided, assign a fake one to satisfy Firebase Auth
       const emailToUse = emailInput && emailInput.includes('@') ? emailInput : `${username}@novi.local`;
 
       try {
@@ -466,7 +459,7 @@
         await setDoc(doc(db, 'users', cred.user.uid), {
           username: username, 
           email: emailToUse,
-          emailVerified: emailToUse !== `${username}@novi.local`, // true if real email provided at start, false if fake
+          emailVerified: false, 
           avatar: '', bio: '', bgColor: '#000000', bgPreset: null, links: [],
           banned: false, verified: isAdmin, role: isAdmin ? 'admin' : 'user', createdAt: Date.now()
         });
@@ -488,7 +481,6 @@
       try {
         let emailToLogin = identifier;
         
-        // If they entered a username instead of an email, look up their real email
         if (!identifier.includes('@')) {
           const q = query(collection(db, 'users'), where('username', '==', identifier.toLowerCase()));
           const snap = await getDocs(q);
@@ -528,9 +520,6 @@
       this.updatePreview();
     },
 
-    // ====================================================================
-    // NEW: 6-DIGIT CODE EMAIL VERIFICATION SYSTEM
-    // ====================================================================
     renderEmailSection(user) {
       const statusBox = $('#email-status-box');
       const area = $('#email-management-area');
@@ -538,39 +527,41 @@
       const isFakeEmail = !user.email || user.email.endsWith('@novi.local');
       
       if (user.pendingEmail) {
-        // State: Waiting for code verification
         statusBox.innerHTML = `<div class="status-box status-pending">PENDING VERIFICATION: ${escapeHtml(user.pendingEmail)}</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Enter 6-Digit Code</label><input type="text" id="code-input" maxlength="6" placeholder="123456" style="text-align: center; font-family: monospace; letter-spacing: 4px;"></div>
           <button id="verify-code-btn" class="btn btn-block">Verify Email</button>
         `;
       } else if (isFakeEmail) {
-        // State: No real email added yet
         statusBox.innerHTML = `<div class="status-box status-none">NO EMAIL ADDED</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Add Email Address</label><input type="email" id="new-email-input" placeholder="your@email.com"></div>
           <button id="send-code-btn" class="btn btn-block">Send Verification Code</button>
         `;
-      } else {
-        // State: Verified email
+      } else if (user.emailVerified) {
         statusBox.innerHTML = `<div class="status-box status-verified">VERIFIED: ${escapeHtml(user.email)}</div>`;
         area.innerHTML = `
           <div class="form-group"><label>Change Email Address</label><input type="email" id="new-email-input" placeholder="new@email.com"></div>
           <button id="send-code-btn" class="btn btn-ghost btn-block">Send Verification Code</button>
+        `;
+      } else {
+        statusBox.innerHTML = `<div class="status-box status-pending">UNVERIFIED: ${escapeHtml(user.email)}</div>`;
+        area.innerHTML = `
+          <button id="send-code-btn" class="btn btn-block">Send Verification Code to ${escapeHtml(user.email)}</button>
         `;
       }
     },
 
     async handleSendCode() {
       if (!this.currentUser) return;
-      const newEmail = $('#new-email-input').value.trim();
+      const input = $('#new-email-input');
+      const newEmail = input && input.value.trim() ? input.value.trim() : this.currentUser.email;
+      
       if (!newEmail || !newEmail.includes('@')) return toast('Please enter a valid email.', 'error');
 
-      // Generate 6-digit code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
 
       try {
-        // Save code and pending email to Firestore
         await updateDoc(doc(db, 'users', this.currentUser.uid), {
           pendingEmail: newEmail,
           verificationCode: code
@@ -579,11 +570,9 @@
         this.currentUser.pendingEmail = newEmail;
         this.currentUser.verificationCode = code;
 
-        // Send email via EmailJS
         await sendVerificationEmail(newEmail, code);
         toast('Verification code sent to your email!', 'success');
         
-        // Re-render the UI to show the code input
         this.renderEmailSection(this.currentUser);
       } catch (err) {
         toast('Failed to send code. Check EmailJS keys.', 'error');
@@ -600,10 +589,8 @@
       }
 
       try {
-        // Update Firebase Auth email
         await updateEmail(auth.currentUser, this.currentUser.pendingEmail);
         
-        // Update Firestore
         await updateDoc(doc(db, 'users', this.currentUser.uid), {
           email: this.currentUser.pendingEmail,
           emailVerified: true,
@@ -611,7 +598,6 @@
           verificationCode: null
         });
 
-        // Update local state
         this.currentUser.email = this.currentUser.pendingEmail;
         this.currentUser.emailVerified = true;
         delete this.currentUser.pendingEmail;
